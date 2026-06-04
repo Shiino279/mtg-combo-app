@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>MTG Card Finder</title>
+<title>MTG Combo Finder</title>
 
 <style>
 body {
@@ -42,21 +42,54 @@ input {
   border-radius: 12px;
   max-width: 500px;
 }
+
+.combo {
+  background: #1e293b;
+  margin: 10px auto;
+  padding: 12px;
+  border-radius: 10px;
+  max-width: 500px;
+  border: 1px solid #334155;
+}
 </style>
 
 </head>
-
 <body>
 
-<h1>🧙 MTG Card Finder</h1>
+<h1>🧙 MTG Combo Finder</h1>
 
 <input id="search" placeholder="Karte suchen...">
 <div id="suggestions"></div>
+
 <div id="result"></div>
+<div id="combos"></div>
 
 <script>
 
-// Input Event
+// ✅ COMBO DATENBANK
+const combos = [
+  {
+    name: "Heliod + Walking Ballista",
+    cards: ["Heliod, Sun-Crowned", "Walking Ballista"],
+    effect: "Unendlich Schaden",
+    how: "Lifelink + Schaden → Lebensgewinn → Marken → wiederholen"
+  },
+  {
+    name: "Thassa's Oracle Combo",
+    cards: ["Thassa's Oracle", "Demonic Consultation"],
+    effect: "Sofortiger Sieg",
+    how: "Deck exilen → Oracle spielen → gewinnen"
+  },
+  {
+    name: "Devoted Druid Combo",
+    cards: ["Devoted Druid", "Vizier of Remedies"],
+    effect: "Unendlich Mana",
+    how: "Tap → enttappen → repeat"
+  }
+];
+
+
+// 🔎 AUTOCOMPLETE
 document.getElementById("search").addEventListener("input", function() {
 
   const query = this.value;
@@ -69,7 +102,7 @@ document.getElementById("search").addEventListener("input", function() {
   document.getElementById("suggestions").innerHTML = "Lade...";
 
   fetch("https://api.scryfall.com/cards/autocomplete?q=" + encodeURIComponent(query))
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
 
       const box = document.getElementById("suggestions");
@@ -86,7 +119,6 @@ document.getElementById("search").addEventListener("input", function() {
         div.className = "suggestion";
         div.innerText = name;
 
-        // CLICK FIX
         div.onclick = function() {
           document.getElementById("search").value = name;
           loadCard(name);
@@ -99,14 +131,15 @@ document.getElementById("search").addEventListener("input", function() {
     .catch(() => {
       document.getElementById("suggestions").innerHTML = "Fehler";
     });
-
 });
 
 
-// Karte laden
+// 🎴 KARTE LADEN
 function loadCard(name) {
 
   document.getElementById("result").innerHTML = "Lade Karte...";
+  document.getElementById("combos").innerHTML = "";
+  document.getElementById("suggestions").innerHTML = "";
 
   fetch("https://api.scryfall.com/cards/named?fuzzy=" + encodeURIComponent(name))
     .then(res => res.json())
@@ -119,8 +152,8 @@ function loadCard(name) {
         image = card.card_faces[0].image_uris.normal;
       }
 
-      let text = card.oracle_text || 
-                 (card.card_faces && card.card_faces[0].oracle_text) || 
+      let text = card.oracle_text ||
+                 (card.card_faces && card.card_faces[0].oracle_text) ||
                  "Kein Text";
 
       document.getElementById("result").innerHTML =
@@ -131,11 +164,37 @@ function loadCard(name) {
         '<p style="white-space: pre-line;">' + text + '</p>' +
         '</div>';
 
+      showCombos(card.name);
     })
     .catch(() => {
       document.getElementById("result").innerHTML = "Fehler beim Laden";
     });
+}
 
+
+// 🔥 COMBOS ANZEIGEN
+function showCombos(cardName) {
+
+  const found = combos.filter(c => c.cards.includes(cardName));
+
+  const box = document.getElementById("combos");
+
+  if (found.length === 0) {
+    box.innerHTML = "<p>Keine Combos gefunden 😢</p>";
+    return;
+  }
+
+  box.innerHTML = "<h2>Combos:</h2>";
+
+  found.forEach(c => {
+    box.innerHTML +=
+      '<div class="combo">' +
+      '<h3>' + c.name + '</h3>' +
+      '<p><b>Karten:</b> ' + c.cards.join(", ") + '</p>' +
+      '<p><b>Effekt:</b> ' + c.effect + '</p>' +
+      '<p><b>So funktioniert es:</b> ' + c.how + '</p>' +
+      '</div>';
+  });
 }
 
 </script>
