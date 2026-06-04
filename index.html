@@ -70,8 +70,9 @@ h1 { margin-top:40px; color:#f97316; }
 }
 
 .cardImages img {
-  width:140px;
-  border-radius:10px;
+  width:160px;
+  border-radius:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.6);
 }
 
 .arrow {
@@ -136,18 +137,35 @@ const combos = [
     cards: ["Hellkite Charger", "Sozin's Comet"],
     text: `
 <b>Startzustand:</b><br>
-- Hellkite Charger im Spiel.<br>
-- Sozin's Comet auf Hand oder im Exil.<br><br>
+- Hellkite Charger liegt im Spiel.<br>
+- Sozin's Comet ist auf der Hand oder im Exil (wurde zuvor vorhergesagt).<br><br>
 
-<b>Mana:</b><br>
+<b>Voraussetzungen:</b><br>
+- Du kontrollierst eine weitere Kreatur, die angreifen kann.<br>
+- Ein Gegner kann deine Kreaturen nicht blocken.<br><br>
+
+<b>Benötigtes Mana:</b><br>
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/3.svg">
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"><br><br>
 
+<div class="steps">
+<b>Ablauf:</b>
+<ol>
+<li>Wirke Sozin's Comet aus der Hand ({3}{R}{R}) oder aus dem Exil ({2}{R}).</li>
+<li>Alle deine Kreaturen erhalten Firebending 5 bis zum Ende des Zuges.</li>
+<li>Greife mit Hellkite Charger und mindestens einer weiteren Kreatur an.</li>
+<li>Jede Firebending-Fähigkeit wird ausgelöst und erzeugt mehrfach rotes Mana.</li>
+<li>Zahle <img class="mana" src="https://svgs.scryfall.io/card-symbols/5.svg"> <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"> <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"> , um Hellkite Charger zu aktivieren.</li>
+<li>Alle angreifenden Kreaturen werden enttappt und du erhältst eine zusätzliche Kampfphase.</li>
+<li>Wiederhole ab Schritt 3 in jeder weiteren Combat Phase.</li>
+</ol>
+</div>
+
 <b>Ergebnis:</b><br>
-- Unendlich Combat Phasen<br>
-- Unendlich Mana<br>
-- Unendlich Schaden
+- Unendlich viele Kampfphasen<br>
+- Unendlich rotes Mana<br>
+- Unendlich Kampfschaden
 `
   },
 
@@ -156,11 +174,28 @@ const combos = [
     cards: ["Hellkite Charger", "Firebending Student"],
     text: `
 <b>Startzustand:</b><br>
-- Beide Karten im Spiel.<br>
-- Student ≥7 Stärke.<br><br>
+- Hellkite Charger und Firebending Student liegen im Spiel.<br>
+- Firebending Student hat keine Summoning Sickness und mindestens Stärke 7.<br><br>
+
+<b>Voraussetzungen:</b><br>
+- Ein Gegner kann deine Kreaturen nicht blocken.<br><br>
+
+<div class="steps">
+<b>Ablauf:</b>
+<ol>
+<li>Greife mit Hellkite Charger und Firebending Student an.</li>
+<li>Beide Fähigkeiten werden ausgelöst.</li>
+<li>Firebending Student erzeugt rotes Mana entsprechend seiner Stärke.</li>
+<li>Zahle <img class="mana" src="https://svgs.scryfall.io/card-symbols/5.svg"> <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"> <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"> , um Hellkite Charger zu aktivieren.</li>
+<li>Alle angreifenden Kreaturen werden enttappt und du erhältst eine zusätzliche Kampfphase.</li>
+<li>Wiederhole jede Combat Phase.</li>
+</ol>
+</div>
 
 <b>Ergebnis:</b><br>
-- Infinite Combats
+- Unendlich viele Kampfphasen<br>
+- Unendlich rotes Mana<br>
+- Unendlich Kampfschaden
 `
   }
 ];
@@ -192,7 +227,6 @@ function openCombo(index) {
   combo.cards.forEach((card, i) => {
     const imageURL = `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card)}&format=image`;
 
-    // ✅ FIX: echte Bilder anzeigen
     cardsHTML += `<img src="${imageURL}">`;
 
     if (i < combo.cards.length - 1) {
