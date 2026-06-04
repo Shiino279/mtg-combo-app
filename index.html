@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -60,7 +61,6 @@ h1 { margin-top:40px; color:#f97316; }
   text-align:left;
 }
 
-/* FLOW ANIMATION */
 .cardImages {
   display:flex;
   align-items:center;
@@ -72,41 +72,11 @@ h1 { margin-top:40px; color:#f97316; }
 .cardImages img {
   width:140px;
   border-radius:10px;
-  opacity:0;
-  transform:translateY(20px);
-  animation:fadeInUp 0.6s forwards;
-}
-
-.cardImages img:nth-child(1) { animation-delay:0.2s; }
-.cardImages img:nth-child(3) { animation-delay:0.6s; }
-
-@keyframes fadeInUp {
-  to { opacity:1; transform:translateY(0); }
 }
 
 .arrow {
   font-size:28px;
   color:#f97316;
-  opacity:0;
-  animation:arrowPulse 1s infinite alternate, fadeIn 0.5s forwards;
-  animation-delay:0.3s;
-}
-
-@keyframes arrowPulse {
-  from { transform:scale(1); opacity:0.6; }
-  to { transform:scale(1.2); opacity:1; }
-}
-
-@keyframes fadeIn {
-  to { opacity:1; }
-}
-
-.steps ol {
-  padding-left:20px;
-}
-
-.steps li {
-  margin-bottom:8px;
 }
 
 button {
@@ -161,7 +131,6 @@ button {
 <script>
 
 const combos = [
-
   {
     name: "Hellkite + Sozin's Comet",
     cards: ["Hellkite Charger", "Sozin's Comet"],
@@ -175,25 +144,9 @@ const combos = [
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"><br><br>
 
-<div class="steps">
-<b>Ablauf:</b>
-<ol>
-<li>Wirke Sozin's Comet.</li>
-<li>Alle Kreaturen erhalten Firebending 5.</li>
-<li>Greife mit Hellkite Charger an.</li>
-<li>Erzeuge rotes Mana.</li>
-<li>Zahle 
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/5.svg">
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
-→ neue Combat Phase.</li>
-<li>Wiederhole beliebig oft.</li>
-</ol>
-</div>
-
 <b>Ergebnis:</b><br>
 - Unendlich Combat Phasen<br>
-- Unendlich rotes Mana<br>
+- Unendlich Mana<br>
 - Unendlich Schaden
 `
   },
@@ -204,35 +157,12 @@ const combos = [
     text: `
 <b>Startzustand:</b><br>
 - Beide Karten im Spiel.<br>
-- Student hat Stärke ≥ 7 und keine Summoning Sickness.<br><br>
-
-<b>Voraussetzung:</b><br>
-- Gegner kann nicht blocken.<br><br>
-
-<b>Mana:</b><br>
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/5.svg">
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"><br><br>
-
-<div class="steps">
-<b>Ablauf:</b>
-<ol>
-<li>Greife mit beiden Kreaturen an.</li>
-<li>Trigger werden ausgelöst.</li>
-<li>Student erzeugt rotes Mana.</li>
-<li>Zahle Kosten für Hellkite.</li>
-<li>Kreaturen enttappen + neue Combat Phase.</li>
-<li>Wiederhole beliebig oft.</li>
-</ol>
-</div>
+- Student ≥7 Stärke.<br><br>
 
 <b>Ergebnis:</b><br>
-- Unendlich Combat Phasen<br>
-- Unendlich rotes Mana<br>
-- Unendlich Schaden
+- Infinite Combats
 `
   }
-
 ];
 
 document.getElementById("comboCount").innerText = combos.length;
@@ -262,7 +192,8 @@ function openCombo(index) {
   combo.cards.forEach((card, i) => {
     const imageURL = `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card)}&format=image`;
 
-    cardsHTML += `${imageURL}`;
+    // ✅ FIX: echte Bilder anzeigen
+    cardsHTML += `<img src="${imageURL}">`;
 
     if (i < combo.cards.length - 1) {
       cardsHTML += `<span class="arrow">➜</span>`;
