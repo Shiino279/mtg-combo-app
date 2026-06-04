@@ -13,62 +13,49 @@ body {
   text-align: center;
 }
 
-/* Titel */
 h1 {
   margin-top: 40px;
   font-size: 40px;
-  letter-spacing: 2px;
-  color: #f59e0b;
+  color: #f97316;
 }
 
-/* Untertitel */
-p {
-  color: #94a3b8;
-}
-
-/* Container */
+/* Card Container */
 .container {
   display: flex;
   justify-content: center;
   margin-top: 60px;
 }
 
-/* CARD */
 .card {
   width: 300px;
   height: 420px;
   perspective: 1000px;
 }
 
-.inner-card {
+/* Flip Animation */
+.inner {
   width: 100%;
   height: 100%;
-  position: relative;
-  transform-style: preserve-3d;
   transition: transform 0.8s;
+  transform-style: preserve-3d;
+  position: relative;
 }
 
-/* Hover Flip */
-.card:hover .inner-card {
+.card:hover .inner {
   transform: rotateY(180deg);
 }
 
-/* Vorder & Rückseite */
+/* Vorder + Rückseite */
 .front, .back {
   position: absolute;
   width: 100%;
   height: 100%;
-  border-radius: 16px;
+  border-radius: 15px;
   overflow: hidden;
   backface-visibility: hidden;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.6);
 }
 
 /* Vorderseite */
-.front {
-  background: #1e293b;
-}
-
 .front img {
   width: 100%;
   height: 100%;
@@ -81,24 +68,22 @@ p {
   transform: rotateY(180deg);
 
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
-/* Text Rückseite */
 .back h2 {
-  font-size: 28px;
   color: #f97316;
 }
 
 .back p {
-  font-size: 18px;
+  color: #e2e8f0;
 }
 
 /* Glow Effekt */
 .card:hover {
-  box-shadow: 0 0 25px rgba(249,115,22,0.6);
+  box-shadow: 0 0 25px rgba(249,115,22,0.7);
 }
 </style>
 
@@ -107,21 +92,20 @@ p {
 <body>
 
 <h1>🔥 Shiinos Combis 🔥</h1>
-<p>Meine persönlichen Magic Kombos</p>
 
 <div class="container">
 
   <div class="card">
-    <div class="inner-card">
+    <div class="inner">
 
-      <!-- Vorderseite -->
+      <!-- ✅ DEIN AZULA BILD -->
       <div class="front">
-        <img src="https://uploads3.wikiart.org/images/noartist/firelord-azula-avatar-the-last-airbender.jpg" alt="Azula">
+        <img src="azula.jpg">
       </div>
 
       <!-- Rückseite -->
       <div class="back">
-        <h2>🔥 Azula Deck 🔥</h2>
+        <h2>Azula Deck</h2>
         <p>Combos im Deck:</p>
         <h2>7</h2>
       </div>
