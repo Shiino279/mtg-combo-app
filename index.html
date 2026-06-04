@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -5,104 +6,24 @@
 <title>Shiinos Combis</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background: #020617;
-  color: white;
-  text-align: center;
-}
-
-h1 {
-  margin-top: 40px;
-  color: #f97316;
-}
-
-.container {
-  display: flex;
-  justify-content: center;
-  margin-top: 60px;
-}
-
-.card {
-  width: 300px;
-  height: 420px;
-  perspective: 1000px;
-  cursor: pointer;
-}
-
-.inner {
-  width: 100%;
-  height: 100%;
-  transition: transform 0.8s;
-  transform-style: preserve-3d;
-  position: relative;
-}
-
-.card:hover .inner {
-  transform: rotateY(180deg);
-}
-
-.front, .back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 15px;
-  overflow: hidden;
-  backface-visibility: hidden;
-}
-
-.front img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.back {
-  background: linear-gradient(135deg, #7c2d12, #1e293b);
-  transform: rotateY(180deg);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.combo {
-  background: #1e293b;
-  margin: 10px auto;
-  padding: 15px;
-  border-radius: 10px;
-  max-width: 600px;
-  cursor: pointer;
-}
-
-.cardView {
-  background: #1e293b;
-  padding: 20px;
-  margin: 20px;
-  border-radius: 10px;
-  text-align: left;
-}
-
-.cardImages {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-.cardImages img {
-  width: 150px;
-  border-radius: 10px;
-}
-
-button {
-  padding: 10px;
-  background: #f97316;
-  border: none;
-  border-radius: 8px;
-  color: white;
-  cursor: pointer;
-}
+body { margin:0; font-family:"Segoe UI",sans-serif; background:#020617; color:white; text-align:center; }
+h1 { margin-top:40px; color:#f97316; }
+.container { display:flex; justify-content:center; margin-top:60px; }
+.card { width:300px; height:420px; perspective:1000px; cursor:pointer; }
+.inner { width:100%; height:100%; transition:transform 0.8s; transform-style:preserve-3d; position:relative; }
+.card:hover .inner { transform: rotateY(180deg); }
+.front,.back { position:absolute; width:100%; height:100%; border-radius:15px; overflow:hidden; backface-visibility:hidden; }
+.front img { width:100%; height:100%; object-fit:cover; }
+.back { background:linear-gradient(135deg,#7c2d12,#1e293b); transform:rotateY(180deg); display:flex; flex-direction:column; justify-content:center; }
+.combo { background:#1e293b; margin:10px auto; padding:15px; border-radius:10px; max-width:600px; cursor:pointer; }
+.cardView { background:#1e293b; padding:20px; margin:20px; border-radius:10px; text-align:left; }
+.cardImages { display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; }
+.cardImages img { width:140px; border-radius:10px; }
+.arrow { font-size:28px; color:#f97316; }
+.steps ol { padding-left:20px; }
+.steps li { margin-bottom:8px; }
+button { padding:10px; background:#f97316; border:none; border-radius:8px; color:white; cursor:pointer; }
+.mana { width:20px; vertical-align:middle; }
 </style>
 </head>
 
@@ -113,8 +34,8 @@ button {
 <div id="homePage" class="container">
   <div class="card" onclick="openDeck()">
     <div class="inner">
-     <div class="front">
-       <img src="azula.jpg">
+      <div class="front">
+        azula.jpg
       </div>
       <div class="back">
         <h2>Azula Deck</h2>
@@ -148,27 +69,32 @@ const combos = [
     text: `
 <b>Startzustand:</b><br>
 - Hellkite Charger liegt im Spiel.<br>
-- Sozin's Comet ist auf der Hand oder im Exil (Foretell vorbereitet).<br><br>
-
-<b>Voraussetzungen:</b><br>
-- Du kontrollierst eine weitere angreifende Kreatur.<br>
-- Ein Gegner kann deine Kreaturen nicht blocken.<br><br>
+- Sozin's Comet ist auf der Hand oder im Exil.<br><br>
 
 <b>Benötigtes Mana:</b><br>
-- Bis zu {3}{R}{R} verfügbar.<br><br>
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/3.svg"> 
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"> 
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"><br><br>
 
-<b>Ablauf:</b><br>
-1. Wirke Sozin's Comet aus der Hand ({3}{R}{R}) oder aus dem Exil ({2}{R}).<br>
-2. Alle deine Kreaturen erhalten Firebending 5 bis zum Ende des Zuges.<br>
-3. Greife mit Hellkite Charger und mindestens einer weiteren Kreatur an.<br>
-4. Jede Firebending-Fähigkeit erzeugt rotes Mana.<br>
-5. Zahle {5}{R}{R} für Hellkite Charger → enttappe Kreaturen und erhalte zusätzliche Kampfphase.<br>
-6. Wiederhole diesen Ablauf beliebig oft.<br><br>
+<div class="steps">
+<b>Ablauf:</b>
+<ol>
+<li>Wirke Sozin's Comet.</li>
+<li>Alle Kreaturen erhalten Firebending 5.</li>
+<li>Greife mit Hellkite Charger + Kreatur an.</li>
+<li>Erzeuge rotes Mana durch Firebending.</li>
+<li>Zahle <img class="mana" src="https://svgs.scryfall.io/card-symbols/5.svg"> + 
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"> 
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"> 
+→ neue Combat Phase.</li>
+<li>Wiederhole beliebig oft.</li>
+</ol>
+</div>
 
 <b>Ergebnis:</b><br>
-- Unendlich Kampfphasen<br>
-- Unendlich rotes Mana<br>
-- Unendlich Schaden
+- Unendliche Combat Phasen<br>
+- Unendliches rotes Mana<br>
+- Unendlicher Schaden
 `
   }
 ];
@@ -183,11 +109,7 @@ function openDeck() {
   list.innerHTML = "";
 
   combos.forEach((c, index) => {
-    list.innerHTML += `
-      <div class="combo" onclick="openCombo(${index})">
-        <h3>${c.name}</h3>
-      </div>
-    `;
+    list.innerHTML += `<div class="combo" onclick="openCombo(${index})"><h3>${c.name}</h3></div>`;
   });
 }
 
@@ -200,9 +122,12 @@ function openCombo(index) {
   document.getElementById("comboTitle").innerText = combo.name;
 
   let cardsHTML = "";
-  combo.cards.forEach(card => {
+  combo.cards.forEach((card, i) => {
     const imageURL = `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card)}&format=image`;
-    cardsHTML += `<img src="${imageURL}" alt="${card}">`;
+    cardsHTML += `<img src="${imageURL}">`;
+    if (i < combo.cards.length - 1) {
+      cardsHTML += `<span class="arrow">➜</span>`;
+    }
   });
 
   document.getElementById("comboDetail").innerHTML = `
