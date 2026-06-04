@@ -1,4 +1,111 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html margin: 20px auto;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 500px;
+}
+</style>
+
+</head>
+<body>
+
+<h1>🧙 MTG Card Finder</h1>
+
+<input id="search" placeholder="Kartennamen...">
+
+<div id="suggestions"></div>
+<div id="results"></div>
+
+<script>
+
+// Debug
+console.log("✅ Script läuft");
+
+const input = document.getElementById("search");
+
+// 🔎 AUTOCOMPLETE
+input.addEventListener("input", function() {
+
+  const query = input.value;
+
+  if (query.length < 2) {
+    document.getElementById("suggestions").innerHTML = "";
+    return;
+  }
+
+  fetch("https://api.scryfall.com/cards/autocomplete?q=" + encodeURIComponent(query))
+    .then(res => res.json())
+    .then(data => {
+
+      const box = document.getElementById("suggestions");
+      box.innerHTML = "";
+
+      if (!data.data) return;
+
+      data.data.forEach(name => {
+
+        const div = document.createElement("div");
+        div.className = "suggestion";
+        div.innerText = name;
+
+        div.onclick = () => loadCard(name);
+
+        box.appendChild(div);
+      });
+
+    })
+    .catch(err => console.error("❌ Autocomplete Fehler:", err));
+});
+
+
+// 🎴 KARTE LADEN
+function loadCard(name) {
+
+  console.log("🎴 Lade Karte:", name);
+
+  const results = document.getElementById("results");
+  results.innerHTML = "<p>Lade Karte...</p>";
+
+  fetch("https://api.scryfall.com/cards/named?fuzzy=" + encodeURIComponent(name))
+    .then(res => res.json())
+    .then(card => {
+
+      let image = "";
+      let text = "Kein Text verfügbar";
+      let type = card.type_line || "";
+
+      // ✅ Bild
+      if (card.image_uris && card.image_uris.normal) {
+        image = card.image_uris.normal;
+      } else if (card.card_faces && card.card_faces[0]?.image_uris) {
+        image = card.card_faces[0].image_uris.normal;
+      }
+
+      // ✅ Text
+      if (card.oracle_text) {
+        text = card.oracle_text;
+      } else if (card.card_faces && card.card_faces[0]) {
+        text = card.card_faces[0].oracle_text || text;
+      }
+
+      results.innerHTML = `
+        <div class="card">
+          ${image ? `<img src="${image}" width="250"><br><br>` : "<p>Kein Bild</p>"}
+          <h2>${card.name}</h2>
+          <p>${type}</p>
+          <p style="white-space: pre-line;">${text}</p>
+        </div>
+      `;
+    })
+    .catch(err => {
+      console.error("❌ Fehler beim Laden:", err);
+      results.innerHTML = "<p>Fehler beim Laden</p>";
+    });
+}
+
+</script>
+
+</body>
+</html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
@@ -23,7 +130,6 @@ input {
   border: none;
 }
 
-/* Vorschläge */
 #suggestions {
   width: 260px;
   margin: auto;
@@ -40,110 +146,5 @@ input {
   background: #334155;
 }
 
-/* Ergebnis */
 .card {
   background: #1e293b;
-  margin: 20px auto;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 500px;
-}
-</style>
-
-</head>
-
-<body>
-
-<h1>🧙 MTG Card Finder</h1>
-
-<input id="search" placeholder="Kartennamen...">
-
-<div id="suggestions"></div>
-<div id="results"></div>
-
-<script>
-
-console.log("Script läuft ✅");
-
-/* 🔎 AUTOCOMPLETE */
-document.getElementById("search").addEventListener("input", function() {
-  let query = this.value;
-
-  if (query.length < 2) {
-    document.getElementById("suggestions").innerHTML = "";
-    return;
-  }
-
-  fetch("https://api.scryfall.com/cards/autocomplete?q=" + encodeURIComponent(query))
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-
-      let box = document.getElementById("suggestions");
-      box.innerHTML = "";
-
-      if (!data || !data.data) return;
-
-      for (let i = 0; i < data.data.length; i++) {
-
-        let name = data.data[i];
-
-        let div = document.createElement("div");
-        div.className = "suggestion";
-        div.innerText = name;
-
-        div.onclick = function() {
-          loadCard(name);
-        };
-
-        box.appendChild(div);
-      }
-
-    })
-    .catch(function(err) {
-      console.log("Autocomplete Fehler:", err);
-    });
-});
-
-
-/* 🎴 KARTE LADEN */
-function loadCard(name) {
-
-  console.log("Lade Karte:", name);
-
-  document.getElementById("results").innerHTML = "<p>Lade...</p>";
-  document.getElementById("suggestions").innerHTML = "";
-
-  fetch("https://api.scryfall.com/cards/named?fuzzy=" + encodeURIComponent(name))
-    .then(function(res) { return res.json(); })
-    .then(function(card) {
-
-      console.log("API Antwort:", card);
-
-      let image = "";
-      let text = "Kein Text verfügbar";
-      let type = "";
-
-      // Bild sicher holen
-      if (card.image_uris && card.image_uris.normal) {
-        image = card.image_uris.normal;
-      } 
-      else if (card.card_faces && card.card_faces[0] && card.card_faces[0].image_uris) {
-        image = card.card_faces[0].image_uris.normal;
-      }
-
-      // Text sicher holen
-      if (card.oracle_text) {
-        text = card.oracle_text;
-      } 
-      else if (card.card_faces && card.card_faces[0]) {
-        text = card.card_faces[0].oracle_text || text;
-      }
-
-      // Typ
-      if (card.type_line) {
-        type = card.type_line;
-      }
-
-      document.getElementById("results").innerHTML = `
-        <div class="card">
-          ${image ? `<img src="${image}" width="ein Bild</p>"}
