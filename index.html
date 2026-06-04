@@ -90,6 +90,7 @@ const combos = [
 
 
 // 🔎 AUTOCOMPLETE
+
 document.getElementById("search").addEventListener("input", function() {
 
   const query = this.value;
@@ -99,40 +100,37 @@ document.getElementById("search").addEventListener("input", function() {
     return;
   }
 
-  document.getElementById("suggestions").innerHTML = "Lade...";
-
-  fetch("https://api.scryfall.com/cards/autocomplete?q=" + encodeURIComponent(query))
+  fetch("https://api.scryfall.com/cards/named?exact=" + encodeURIComponent(query))
     .then(res => res.json())
-    .then(data => {
+    .then(card => {
 
       const box = document.getElementById("suggestions");
       box.innerHTML = "";
 
-      if (!data.data) {
-        box.innerHTML = "Keine Ergebnisse";
+      // ✅ Nur anzeigen wenn Karte existiert
+      if (card.object === "error") {
+        box.innerHTML = "<p>Keine Karte gefunden</p>";
         return;
       }
 
-      data.data.forEach(name => {
+      // ✅ GENAU 1 Ergebnis
+      const div = document.createElement("div");
+      div.className = "suggestion";
+      div.innerText = card.name;
 
-        const div = document.createElement("div");
-        div.className = "suggestion";
-        div.innerText = name;
+      div.onclick = function () {
+        document.getElementById("search").value = card.name;
+        loadCard(card.name);
+      };
 
-        div.onclick = function() {
-          document.getElementById("search").value = name;
-          loadCard(name);
-        };
-
-        box.appendChild(div);
-      });
+      box.appendChild(div);
 
     })
     .catch(() => {
       document.getElementById("suggestions").innerHTML = "Fehler";
     });
-});
 
+});
 
 // 🎴 KARTE LADEN
 function loadCard(name) {
