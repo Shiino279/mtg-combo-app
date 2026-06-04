@@ -12,6 +12,10 @@ body {
   text-align: center;
 }
 
+h1 {
+  margin-top: 20px;
+}
+
 input {
   padding: 10px;
   width: 260px;
@@ -19,6 +23,7 @@ input {
   border: none;
 }
 
+/* Vorschläge */
 #suggestions {
   width: 260px;
   margin: auto;
@@ -35,6 +40,7 @@ input {
   background: #334155;
 }
 
+/* Karte */
 .card {
   background: #1e293b;
   margin: 20px auto;
@@ -43,6 +49,7 @@ input {
   max-width: 500px;
 }
 
+/* Combos */
 .combo {
   background: #1e293b;
   margin: 10px auto;
@@ -52,33 +59,34 @@ input {
   border: 1px solid #334155;
 }
 </style>
-
 </head>
+
 <body>
 
 <h1>🧙 MTG Combo Finder</h1>
 
-<input id="search" placeholder="Kartennamen eingeben...">
-
+<input id="search" placeholder="Karte eingeben...">
 <div id="suggestions"></div>
+
 <div id="results"></div>
 <div id="combos"></div>
 
 <script>
+
 document.addEventListener("DOMContentLoaded", function () {
 
   const input = document.getElementById("search");
   const suggestions = document.getElementById("suggestions");
   const results = document.getElementById("results");
-  const comboBox = document.getElementById("combos");
+  const combosBox = document.getElementById("combos");
 
-  // ✅ Combo Datenbank
+  // ✅ Combos
   const combos = [
     {
       name: "Heliod + Walking Ballista",
       cards: ["Heliod, Sun-Crowned", "Walking Ballista"],
-      effect: "Unendlicher Schaden",
-      how: "Gib Lifelink → Schaden → Leben → repeat"
+      effect: "Unendlich Schaden",
+      how: "Lifelink + Schaden → Lebensgewinn → Marken → repeat"
     },
     {
       name: "Thassa's Oracle Combo",
@@ -88,7 +96,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   ];
 
-  // 🔎 Autocomplete
+  // 🔎 AUTOCOMPLETE
   input.addEventListener("input", function () {
 
     const query = input.value;
@@ -106,13 +114,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         suggestions.innerHTML = "";
 
-        if (!data.data) return;
+        if (!data || !data.data) {
+          suggestions.innerHTML = "<p>Keine Ergebnisse</p>";
+          return;
+        }
 
         data.data.forEach(name => {
 
           const div = document.createElement("div");
           div.className = "suggestion";
-          div.innerText = name;
+          div.textContent = name;
 
           div.onclick = function () {
             input.value = name;
@@ -122,35 +133,34 @@ document.addEventListener("DOMContentLoaded", function () {
           suggestions.appendChild(div);
         });
       })
-      .catch(() => {
-        suggestions.innerHTML = "<p>Fehler</p>";
+      .catch(err => {
+        console.log(err);
+        suggestions.innerHTML = "<p style='color:red'>API Fehler</p>";
       });
   });
 
-  // 🎴 Karte laden
+  // 🎴 KARTE LADEN
   function loadCard(name) {
 
     results.innerHTML = "<p>Lade Karte...</p>";
-    comboBox.innerHTML = "";
+    combosBox.innerHTML = "";
     suggestions.innerHTML = "";
 
     fetch("https://api.scryfall.com/cards/named?fuzzy=" + encodeURIComponent(name))
       .then(res => res.json())
       .then(card => {
 
-        let image =
-          card.image_uris?.normal ||
-          card.card_faces?.[0]?.image_uris?.normal || "";
+        let image = card.image_uris?.normal ||
+                    card.card_faces?.[0]?.image_uris?.normal ||
+                    "";
 
-        let text =
-          card.oracle_text ||
-          card.card_faces?.[0]?.oracle_text ||
-          "Kein Text";
+        let text = card.oracle_text ||
+                   card.card_faces?.[0]?.oracle_text ||
+                   "Kein Text verfügbar";
 
         results.innerHTML = `
           <div class="card">
-            ${image ? `<img src="${image : ""}
-            <h2>${card.name}</h2>
+            ${image ? `<img src="${image}" width           <h2>${card.name}</h2>
             <p>${card.type_line || ""}</p>
             <p style="white-space: pre-line;">${text}</p>
           </div>
@@ -163,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  // 🔥 Combos anzeigen
+  // 🔥 COMBOS ANZEIGEN
   function showCombos(cardName) {
 
     const matches = combos.filter(c =>
@@ -171,14 +181,14 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
     if (matches.length === 0) {
-      comboBox.innerHTML = "<p>Keine Combos gefunden 😢</p>";
+      combosBox.innerHTML = "<p>Keine Combos gefunden 😢</p>";
       return;
     }
 
-    comboBox.innerHTML = "<h2>Combos:</h2>";
+    combosBox.innerHTML = "<h2>Combos:</h2>";
 
     matches.forEach(c => {
-      comboBox.innerHTML += `
+      combosBox.innerHTML += `
         <div class="combo">
           <h3>${c.name}</h3>
           <p>${c.cards.join(", ")}</p>
@@ -190,6 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 });
+
 </script>
 
 </body>
