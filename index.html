@@ -10,12 +10,7 @@ h1 { margin-top:40px; color:#f97316; }
 
 .container { display:flex; justify-content:center; margin-top:60px; }
 
-.card {
-  width:300px;
-  height:420px;
-  perspective:1000px;
-  cursor:pointer;
-}
+.card { width:300px; height:420px; perspective:1000px; cursor:pointer; }
 
 .inner {
   width:100%; height:100%;
@@ -65,8 +60,14 @@ h1 { margin-top:40px; color:#f97316; }
   text-align:left;
 }
 
-/* Animation */
-.cardImages { display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; }
+/* FLOW ANIMATION */
+.cardImages {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
 
 .cardImages img {
   width:140px;
@@ -88,6 +89,7 @@ h1 { margin-top:40px; color:#f97316; }
   color:#f97316;
   opacity:0;
   animation:arrowPulse 1s infinite alternate, fadeIn 0.5s forwards;
+  animation-delay:0.3s;
 }
 
 @keyframes arrowPulse {
@@ -97,6 +99,14 @@ h1 { margin-top:40px; color:#f97316; }
 
 @keyframes fadeIn {
   to { opacity:1; }
+}
+
+.steps ol {
+  padding-left:20px;
+}
+
+.steps li {
+  margin-bottom:8px;
 }
 
 button {
@@ -122,12 +132,9 @@ button {
 <div id="homePage" class="container">
   <div class="card" onclick="openDeck()">
     <div class="inner">
-
-      <!-- ✅ FIXED IMAGE -->
       <div class="front">
-        <img src="azula.jpg">
+        azula.jpg
       </div>
-
       <div class="back">
         <h2>Azula Deck</h2>
         <p>Combos:</p>
@@ -155,20 +162,15 @@ button {
 
 const combos = [
 
-  /* 🔥 1. COMET COMBO */
   {
     name: "Hellkite + Sozin's Comet",
     cards: ["Hellkite Charger", "Sozin's Comet"],
     text: `
 <b>Startzustand:</b><br>
-- Hellkite Charger liegt im Spiel.<br>
-- Sozin's Comet ist auf der Hand oder im Exil (Foretell vorbereitet).<br><br>
+- Hellkite Charger im Spiel.<br>
+- Sozin's Comet auf Hand oder im Exil.<br><br>
 
-<b>Voraussetzungen:</b><br>
-- Du kontrollierst eine weitere Kreatur, die angreifen kann.<br>
-- Ein Gegner kann deine Kreaturen nicht blocken.<br><br>
-
-<b>Benötigtes Mana:</b><br>
+<b>Mana:</b><br>
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/3.svg">
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"><br><br>
@@ -176,17 +178,16 @@ const combos = [
 <div class="steps">
 <b>Ablauf:</b>
 <ol>
-<li>Wirke Sozin's Comet aus Hand ({3}{R}{R}) oder Exil ({2}{R}).</li>
+<li>Wirke Sozin's Comet.</li>
 <li>Alle Kreaturen erhalten Firebending 5.</li>
-<li>Greife mit Hellkite Charger + weiterer Kreatur an.</li>
-<li>Firebending erzeugt mehrfach rotes Mana.</li>
+<li>Greife mit Hellkite Charger an.</li>
+<li>Erzeuge rotes Mana.</li>
 <li>Zahle 
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/5.svg">
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
-für Hellkite Charger.</li>
-<li>Alle Kreaturen enttappen + neue Combat Phase.</li>
-<li>Wiederhole unendlich.</li>
+→ neue Combat Phase.</li>
+<li>Wiederhole beliebig oft.</li>
 </ol>
 </div>
 
@@ -197,19 +198,18 @@ für Hellkite Charger.</li>
 `
   },
 
-  /* 🔥 2. STUDENT COMBO */
   {
     name: "Hellkite + Firebending Student",
     cards: ["Hellkite Charger", "Firebending Student"],
     text: `
 <b>Startzustand:</b><br>
-- Beide Kreaturen im Spiel.<br>
-- Firebending Student hat Stärke ≥7 und keine Summoning Sickness.<br><br>
+- Beide Karten im Spiel.<br>
+- Student hat Stärke ≥ 7 und keine Summoning Sickness.<br><br>
 
-<b>Voraussetzungen:</b><br>
+<b>Voraussetzung:</b><br>
 - Gegner kann nicht blocken.<br><br>
 
-<b>Benötigtes Mana:</b><br>
+<b>Mana:</b><br>
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/5.svg">
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"><br><br>
@@ -218,14 +218,11 @@ für Hellkite Charger.</li>
 <b>Ablauf:</b>
 <ol>
 <li>Greife mit beiden Kreaturen an.</li>
-<li>Beide Trigger gehen auf den Stack.</li>
-<li>Firebending Student erzeugt rotes Mana basierend auf Stärke.</li>
-<li>Zahle 
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/5.svg">
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">.</li>
-<li>Alle Kreaturen enttappen + neue Combat Phase.</li>
-<li>Wiederhole unendlich.</li>
+<li>Trigger werden ausgelöst.</li>
+<li>Student erzeugt rotes Mana.</li>
+<li>Zahle Kosten für Hellkite.</li>
+<li>Kreaturen enttappen + neue Combat Phase.</li>
+<li>Wiederhole beliebig oft.</li>
 </ol>
 </div>
 
@@ -265,7 +262,7 @@ function openCombo(index) {
   combo.cards.forEach((card, i) => {
     const imageURL = `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card)}&format=image`;
 
-    cardsmageURL}`;
+    cardsHTML += `${imageURL}`;
 
     if (i < combo.cards.length - 1) {
       cardsHTML += `<span class="arrow">➜</span>`;
