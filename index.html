@@ -14,6 +14,7 @@ body {
   text-align:center;
 }
 
+/* 🌫️ Nebel */
 body::before {
   content:"";
   position:fixed;
@@ -32,11 +33,13 @@ body::before {
   100% { transform:translate(0,0); }
 }
 
+/* 🔥 Titel */
 h1 {
   color:#ff6a00;
   text-shadow:0 0 10px orange;
 }
 
+/* AZULA */
 .card {
   width:300px;
   height:420px;
@@ -46,9 +49,12 @@ h1 {
 
 .card img {
   width:100%;
+  height:100%;
+  object-fit:cover;
   border-radius:12px;
 }
 
+/* COMBOS */
 .combo {
   background:#1e293b;
   margin:10px;
@@ -57,17 +63,21 @@ h1 {
   cursor:pointer;
 }
 
+/* KARTEN */
 .cardImages {
   display:flex;
   justify-content:center;
   gap:10px;
+  flex-wrap:wrap;
 }
 
 .cardImages img {
-  width:150px;
+  width:110px; /* ✅ FIX kleiner */
+  height:auto;
   border-radius:10px;
 }
 
+/* PFEIL */
 .arrow {
   font-size:25px;
   color:orange;
@@ -78,7 +88,9 @@ button {
   padding:10px;
 }
 
-.mana { width:20px; }
+.mana {
+  width:20px;
+}
 </style>
 </head>
 
@@ -86,18 +98,21 @@ button {
 
 <h1>🔥 Shiinos Combos 🔥</h1>
 
+<!-- ✅ AZULA FIX -->
 <div id="homePage">
   <div class="card" onclick="openDeck()">
-    azula.jpg
+    <img src="azula.jpg" alt="Azula">
   </div>
 </div>
 
+<!-- ✅ LIST -->
 <div id="comboPage" style="display:none;">
   <h2>Combos</h2>
   <div id="comboList"></div>
   <button onclick="goBack()">⬅ zurück</button>
 </div>
 
+<!-- ✅ DETAIL -->
 <div id="detailPage" style="display:none;">
   <h2 id="title"></h2>
   <div id="content"></div>
@@ -198,6 +213,7 @@ text:`
 
 ];
 
+/* NAVIGATION */
 function openDeck(){
   document.getElementById("homePage").style.display="none";
   document.getElementById("comboPage").style.display="block";
@@ -206,38 +222,37 @@ function openDeck(){
   list.innerHTML="";
 
   combos.forEach((c,i)=>{
-    let div = document.createElement("div");
+    let div=document.createElement("div");
     div.className="combo";
     div.innerText=c.name;
-    div.onclick = () => openCombo(i);
+    div.onclick=()=>openCombo(i);
     list.appendChild(div);
   });
 }
 
 function openCombo(i){
-  let c = combos[i];
+  let c=combos[i];
 
   document.getElementById("comboPage").style.display="none";
   document.getElementById("detailPage").style.display="block";
 
-  document.getElementById("title").innerText = c.name;
+  document.getElementById("title").innerText=c.name;
 
-  let html = "";
+  let html="";
 
   c.cards.forEach((card,index)=>{
-    let img = "https://api.scryfall.com/cards/named?exact=" 
-              + encodeURIComponent(card) + "&format=image";
+    let img="https://api.scryfall.com/cards/named?exact=" + encodeURIComponent(card) + "&format=image";
 
-    html += "<img src='" + img + "'>";
+    html += "<img src='"+img+"'>";
 
     if(index < c.cards.length-1){
       html += "<span class='arrow'>➜</span>";
     }
   });
 
-  html += "<p>" + c.text + "</p>";
+  html += "<p>"+c.text+"</p>";
 
-  document.getElementById("content").innerHTML = html;
+  document.getElementById("content").innerHTML=html;
 }
 
 function goBack(){
