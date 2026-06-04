@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Shiinos Combos</title>
+<title>Shiinos Combis</title>
 
 <style>
 body { margin:0; font-family:"Segoe UI",sans-serif; background:#020617; color:white; text-align:center; }
@@ -98,7 +97,7 @@ button {
 
 <body>
 
-<h1>🔥 Shiinos Combos 🔥</h1>
+<h1>🔥 Shiinos Combis 🔥</h1>
 
 <div id="homePage" class="container">
   <div class="card" onclick="openDeck()">
@@ -132,19 +131,20 @@ button {
 <script>
 
 const combos = [
-  {
-    name: "Hellkite + Sozin's Comet",
-    cards: ["Hellkite Charger", "Sozin's Comet"],
-    text: `
+
+{
+name: "Hellkite + Sozin's Comet",
+cards: ["Hellkite Charger","Sozin's Comet"],
+text: `
 <b>Startzustand:</b><br>
-- Hellkite Charger liegt im Spiel.<br>
-- Sozin's Comet ist auf der Hand oder im Exil (wurde zuvor vorhergesagt).<br><br>
+- Hellkite Charger im Spiel.<br>
+- Sozin's Comet auf der Hand oder im Exil (Foretell).<br><br>
 
 <b>Voraussetzungen:</b><br>
-- Du kontrollierst eine weitere Kreatur, die angreifen kann.<br>
-- Ein Gegner kann deine Kreaturen nicht blocken.<br><br>
+- Weitere Kreatur kann angreifen.<br>
+- Gegner kann nicht blocken.<br><br>
 
-<b>Benötigtes Mana:</b><br>
+<b>Mana:</b><br>
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/3.svg">
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"><br><br>
@@ -152,107 +152,138 @@ const combos = [
 <div class="steps">
 <b>Ablauf:</b>
 <ol>
-<li>Wirke Sozin's Comet aus der Hand ({3}{R}{R}) oder aus dem Exil ({2}{R}).</li>
-<li>Alle deine Kreaturen erhalten Firebending 5 bis zum Ende des Zuges.</li>
-<li>Greife mit Hellkite Charger und mindestens einer weiteren Kreatur an.</li>
-<li>Jede Firebending-Fähigkeit wird ausgelöst und erzeugt mehrfach rotes Mana.</li>
-<li>Zahle <img class="mana" src="https://svgs.scryfall.io/card-symbols/5.svg"> <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"> <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"> , um Hellkite Charger zu aktivieren.</li>
-<li>Alle angreifenden Kreaturen werden enttappt und du erhältst eine zusätzliche Kampfphase.</li>
-<li>Wiederhole ab Schritt 3 in jeder weiteren Combat Phase.</li>
+<li>Wirke Sozin's Comet.</li>
+<li>Alle Kreaturen erhalten Firebending 5.</li>
+<li>Greife mit mehreren Kreaturen an.</li>
+<li>Erzeuge rotes Mana.</li>
+<li>Zahle 
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/5.svg">
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
+für Hellkite Charger.</li>
+<li>Neue Combat Phase.</li>
+<li>Wiederhole.</li>
 </ol>
 </div>
 
 <b>Ergebnis:</b><br>
-- Unendlich viele Kampfphasen<br>
+- Unendlich Combat Phasen<br>
 - Unendlich rotes Mana<br>
-- Unendlich Kampfschaden
+- Unendlich Schaden
 `
-  },
+},
 
-  {
-    name: "Hellkite + Firebending Student",
-    cards: ["Hellkite Charger", "Firebending Student"],
-    text: `
+{
+name:"Hellkite + Firebending Student",
+cards:["Hellkite Charger","Firebending Student"],
+text:`
 <b>Startzustand:</b><br>
-- Hellkite Charger und Firebending Student liegen im Spiel.<br>
-- Firebending Student hat keine Summoning Sickness und mindestens Stärke 7.<br><br>
+- Beide Kreaturen im Spiel.<br>
+- Student ≥7 Stärke, keine Summoning Sickness.<br><br>
 
 <b>Voraussetzungen:</b><br>
-- Ein Gegner kann deine Kreaturen nicht blocken.<br><br>
+- Gegner kann nicht blocken.<br><br>
 
 <div class="steps">
 <b>Ablauf:</b>
 <ol>
-<li>Greife mit Hellkite Charger und Firebending Student an.</li>
-<li>Beide Fähigkeiten werden ausgelöst.</li>
-<li>Firebending Student erzeugt rotes Mana entsprechend seiner Stärke.</li>
-<li>Zahle <img class="mana" src="https://svgs.scryfall.io/card-symbols/5.svg"> <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"> <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"> , um Hellkite Charger zu aktivieren.</li>
-<li>Alle angreifenden Kreaturen werden enttappt und du erhältst eine zusätzliche Kampfphase.</li>
-<li>Wiederhole jede Combat Phase.</li>
+<li>Greife mit beiden an.</li>
+<li>Trigger gehen auf Stack.</li>
+<li>Student erzeugt Mana.</li>
+<li>Zahle Kosten für Hellkite.</li>
+<li>Neue Combat Phase.</li>
+<li>Wiederhole.</li>
 </ol>
 </div>
 
 <b>Ergebnis:</b><br>
-- Unendlich viele Kampfphasen<br>
-- Unendlich rotes Mana<br>
-- Unendlich Kampfschaden
+- Unendlich Combat Phasen<br>
+- Unendlich Mana<br>
+- Unendlich Schaden
 `
-  }
+},
+
+{
+name:"Overkill + Jaws of Defeat",
+cards:["Overkill","Jaws of Defeat"],
+text:`
+<b>Startzustand:</b><br>
+- Overkill auf der Hand.<br>
+- Jaws of Defeat im Spiel.<br><br>
+
+<b>Voraussetzungen:</b><br>
+- Du kannst eine Kreatur ins Spiel bringen.<br><br>
+
+<b>Mana:</b><br>
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/2.svg">
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/B.svg"><br><br>
+
+<div class="steps">
+<b>Ablauf:</b>
+<ol>
+<li>Kreatur kommt ins Spiel → Trigger.</li>
+<li>Wirke Overkill ({2}{B}).</li>
+<li>Kreatur bekommt -0/-9999.</li>
+<li>Kreatur stirbt.</li>
+<li>Trigger resolved.</li>
+<li>Gegner verliert extrem viel Leben.</li>
+</ol>
+</div>
+
+<b>Ergebnis:</b><br>
+- Gegner verliert das Spiel<br>
+- Nahezu unendlich Lifedrain
+`
+}
+
 ];
 
 document.getElementById("comboCount").innerText = combos.length;
 
-function openDeck() {
-  document.getElementById("homePage").style.display = "none";
-  document.getElementById("comboPage").style.display = "block";
+function openDeck(){
+document.getElementById("homePage").style.display="none";
+document.getElementById("comboPage").style.display="block";
 
-  const list = document.getElementById("comboList");
-  list.innerHTML = "";
+let list=document.getElementById("comboList");
+list.innerHTML="";
 
-  combos.forEach((c, index) => {
-    list.innerHTML += `<div class="combo" onclick="openCombo(${index})"><h3>${c.name}</h3></div>`;
-  });
+combos.forEach((c,i)=>{
+list.innerHTML+=`<div class="combo" onclick="openCombo(${i})"><h3>${c.name}</h3></div>`;
+});
 }
 
-function openCombo(index) {
-  const combo = combos[index];
+function openCombo(i){
+let c=combos[i];
 
-  document.getElementById("comboPage").style.display = "none";
-  document.getElementById("detailPage").style.display = "block";
+document.getElementById("comboPage").style.display="none";
+document.getElementById("detailPage").style.display="block";
 
-  document.getElementById("comboTitle").innerText = combo.name;
+document.getElementById("comboTitle").innerText=c.name;
 
-  let cardsHTML = "";
+let cardsHTML="";
 
-  combo.cards.forEach((card, i) => {
-    const imageURL = `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card)}&format=image`;
+c.cards.forEach((card,index)=>{
+let img=`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card)}&format=image`;
+cardsHTML+=`if(index<c.cards.length-1){
+cardsHTML+=`<span class="arrow">➜</span>`;
+}
+});
 
-    cardsHTML += `<img src="${imageURL}">`;
-
-    if (i < combo.cards.length - 1) {
-      cardsHTML += `<span class="arrow">➜</span>`;
-    }
-  });
-
-  document.getElementById("comboDetail").innerHTML = `
-    <div class="cardView">
-      <h3>Karten:</h3>
-      <div class="cardImages">${cardsHTML}</div>
-      <br>
-      <h3>Beschreibung:</h3>
-      <p>${combo.text}</p>
-    </div>
-  `;
+document.getElementById("comboDetail").innerHTML=
+`<div class="cardView">
+<div class="cardImages">${cardsHTML}</div><br>
+${c.text}
+</div>`;
 }
 
-function goBack() {
-  document.getElementById("homePage").style.display = "flex";
-  document.getElementById("comboPage").style.display = "none";
+function goBack(){
+document.getElementById("homePage").style.display="flex";
+document.getElementById("comboPage").style.display="none";
 }
 
-function backToCombos() {
-  document.getElementById("detailPage").style.display = "none";
-  document.getElementById("comboPage").style.display = "block";
+function backToCombos(){
+document.getElementById("detailPage").style.display="none";
+document.getElementById("comboPage").style.display="block";
 }
 
 </script>
