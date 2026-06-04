@@ -8,145 +8,130 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: radial-gradient(circle at top, #1e293b, #020617);
+  background: radial-gradient(circle at top, #020617, #0f172a);
   color: white;
 }
 
-/* HEADER */
-header {
+h1 {
   text-align: center;
-  padding: 30px;
-  font-size: 36px;
-  font-weight: bold;
+  padding: 25px;
+  font-size: 34px;
   background: linear-gradient(90deg, #22c55e, #4f46e5);
   -webkit-background-clip: text;
   color: transparent;
 }
 
-/* SEARCH */
-.search-box {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  padding: 20px;
+.search {
+  text-align: center;
+  margin: 10px;
 }
 
 input {
-  padding: 14px;
-  border-radius: 12px;
-  border: none;
+  padding: 12px;
   width: 260px;
-  font-size: 16px;
-  background: #0f172a;
+  border-radius: 10px;
+  border: none;
+  background: #1e293b;
   color: white;
-  outline: none;
-  box-shadow: 0 0 10px rgba(34,197,94,0.3);
 }
 
 button {
-  padding: 14px 22px;
-  border-radius: 12px;
+  padding: 12px;
+  border-radius: 10px;
   border: none;
   background: linear-gradient(90deg, #22c55e, #4f46e5);
   color: white;
-  font-weight: bold;
   cursor: pointer;
-  transition: 0.2s;
 }
 
 button:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(34,197,94,0.7);
 }
 
-/* CONTAINER */
+/* Recent cards */
+#recent {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  justify-content: center;
+  overflow-x: auto;
+}
+
+#recent img {
+  height: 80px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#recent img:hover {
+  transform: scale(1.1);
+}
+
 .container {
-  max-width: 950px;
+  max-width: 900px;
   margin: auto;
-  padding: 20px;
 }
 
-/* CARD */
 .card {
-  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+  background: rgba(30, 41, 59, 0.7);
+  margin: 20px;
   padding: 20px;
-  border-radius: 20px;
+  border-radius: 18px;
   backdrop-filter: blur(10px);
-  background: rgba(15, 23, 42, 0.6);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
   transition: 0.3s;
-  position: relative;
-  overflow: hidden;
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, #22c55e, #4f46e5);
-  opacity: 0;
-  transition: 0.3s;
-}
-
-.card:hover::before {
-  opacity: 0.1;
 }
 
 .card:hover {
   transform: translateY(-6px);
 }
 
-/* TITLES */
-.title {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 10px;
+.card img {
+  width: 120px;
+  border-radius: 10px;
 }
 
-.label {
-  color: #94a3b8;
-  font-size: 13px;
+.content {
+  flex: 1;
+}
+
+h2 {
+  margin-top: 0;
+  color: #38bdf8;
 }
 
 .box {
   background: #020617;
-  padding: 12px;
-  border-radius: 12px;
+  padding: 10px;
+  border-radius: 10px;
   margin-top: 10px;
 }
 
 .warning {
   color: #facc15;
-  margin-top: 10px;
   font-size: 12px;
 }
 
 .empty {
   text-align: center;
   color: #64748b;
-  margin-top: 30px;
-}
-
-/* ANIMATION */
-.fade {
-  animation: fadeIn 0.4s ease;
-}
-
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(10px);}
-  to {opacity:1; transform:translateY(0);}
 }
 </style>
 </head>
 
 <body>
 
-<header>🧙 MTG Combo Finder</header>
+<h1>🧙‍♂️ MTG Combo Finder</h1>
 
-<div class="search-box">
-  <input id="search" placeholder="Kartennamen eingeben..." oninput="search()" />
+<div class="search">
+  <input id="search" placeholder="Kartennamen..." oninput="search()" />
   <button onclick="search()">Suchen</button>
 </div>
+
+<!-- 🔁 RECENT CARDS -->
+<div id="recent"></div>
 
 <div class="container" id="results"></div>
 
@@ -156,27 +141,55 @@ const combos = [
     name: "Heliod + Walking Ballista",
     cards: ["Heliod, Sun-Crowned", "Walking Ballista"],
     description: "Unendlicher Schaden",
-    how: "Gib Lifelink → Schaden → Leben → Marke zurück → wiederholen",
-    notes: "Mindestens 2 Marken nötig."
+    how: "Gib Lifelink → Schaden → Leben → Marke zurück",
+    notes: "Mindestens 2 Marken nötig"
   },
   {
     name: "Thassa's Oracle Combo",
     cards: ["Thassa's Oracle", "Demonic Consultation"],
     description: "Sofortiger Sieg",
-    how: "Deck exilen → Oracle spielen → gewinnen",
-    notes: "Timing auf Stack beachten"
+    how: "Deck exilen → Oracle spielen",
+    notes: "Timing beachten"
   }
 ];
 
-function search() {
-  const input = document.getElementById("search").value.toLowerCase();
+// 📷 Bild holen
+function getImage(cardName) {
+  return `https://api.scryfall.com/cards/named?exact=${cardName}&format=image`;
+}
+
+// 🔁 RECENT SYSTEM
+let recentCards = [];
+
+// Karte hinzufügen
+function addRecent(cardName) {
+  recentCards = recentCards.filter(c => c !== cardName);
+  recentCards.unshift(cardName);
+
+  if (recentCards.length > 5) {
+    recentCards.pop();
+  }
+
+  renderRecent();
+}
+
+// Anzeige
+function renderRecent() {
+  const container = document.getElementById("recent");
+  container.innerHTML = "";
+
+  recentCards.forEach(card => {
+    container.innerHTML += `
+      <img 
+        src="${getImage(card)}"
+        onclick="document.getElementById('search').value='${cardyId("search").value.toLowerCase();
   const results = document.getElementById("results");
+
+  results.innerHTML = "";
 
   const filtered = combos.filter(c =>
     c.cards.some(card => card.toLowerCase().includes(input))
   );
-
-  results.innerHTML = "";
 
   if (filtered.length === 0) {
     results.innerHTML = "<p class='empty'>Keine Combos gefunden 😢</p>";
@@ -184,22 +197,24 @@ function search() {
   }
 
   filtered.forEach(c => {
+
+    // 🔁 Wichtig: letzte Karte merken
+    addRecent(c.cards[0]);
+
     results.innerHTML += `
-      <div class="card fade">
-        <div class="title">${c.name}</div>
+      <div class="card">
+        <img src="${getImage(c.cards[0   <div class="content">
+          <h2>${c.name}</h2>
+          <p><b>Karten:</b> ${c.cards.join(", ")}</p>
+          <p>${c.description}</p>
 
-        <div class="label">Karten</div>
-        <div>${c.cards.join(", ")}</div>
+          <div class="box">
+            <b>So funktioniert es:</b><br>
+            ${c.how}
+          </div>
 
-        <div class="label">Beschreibung</div>
-        <div>${c.description}</div>
-
-        <div class="box">
-          <b>So funktioniert es:</b><br>
-          ${c.how}
+          <div class="warning">⚠️ ${c.notes}</div>
         </div>
-
-        <div class="warning">⚠️ ${c.notes}</div>
       </div>
     `;
   });
