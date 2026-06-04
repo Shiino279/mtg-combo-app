@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MTG Combo Finder</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+      padding: 30px;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+    }
+
+    .card {
+      background: #222;
+      padding: 15px;
+      margin: 10px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🧙 MTG Combo Finder</h1>
+
+<input id="search" placeholder="Kartennamen eingeben">
+<button onclick="search()">Suchen</button>
+
+<div id="results"></div>
+
+<script>
+const combos = [
+  {
+    name: "Heliod + Walking Ballista",
+    cards: ["Heliod, Sun-Crowned", "Walking Ballista"],
+    description: "Unendlicher Schaden",
+    how: "Gib Lifelink → Schaden → Leben → Marke zurück",
+    notes: "Mindestens 2 Marken"
+  },
+  {
+    name: "Thassa's Oracle Combo",
+    cards: ["Thassa's Oracle", "Demonic Consultation"],
+    description: "Sofortiger Sieg",
+    how: "Deck exilen → Oracle spielen",
+    notes: "Timing beachten"
+  }
+];
+
+function search() {
+  const input = document.getElementById("search").value.toLowerCase();
+  const results = document.getElementById("results");
+
+  results.innerHTML = "";
+
+  const filtered = combos.filter(c =>
+    c.cards.some(card => card.toLowerCase().includes(input))
+  );
+
+  if (filtered.length === 0) {
+    results.innerHTML = "<p>Keine Combos gefunden</p>";
+    return;
+  }
+
+  filtered.forEach(c => {
+    results.innerHTML += `
+      <div class="card">
+        <h2>${c.name}</h2>
+        <p><b>Karten:</b> ${c.cards.join(", ")}</p>
+        <p>${c.description}</p>
+        <p><b>So klappt's:</b> ${c.how}</p>
+        <p>${c.notes}</p>
+      </div>
+    `;
+  });
+}
+</script>
+
+</body>
+</html>
+``
