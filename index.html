@@ -1,115 +1,8 @@
-<!DOCTYPE html><!DOCTYPE html margin: 20px auto;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 500px;
-}
-</style>
-
-</head>
-<body>
-
-<h1>🧙 MTG Card Finder</h1>
-
-<input id="search" placeholder="Kartennamen...">
-
-<div id="suggestions"></div>
-<div id="results"></div>
-
-<script>
-
-// Debug
-console.log("✅ Script läuft");
-
-const input = document.getElementById("search");
-
-// 🔎 AUTOCOMPLETE
-input.addEventListener("input", function() {
-
-  const query = input.value;
-
-  if (query.length < 2) {
-    document.getElementById("suggestions").innerHTML = "";
-    return;
-  }
-
-  fetch("https://api.scryfall.com/cards/autocomplete?q=" + encodeURIComponent(query))
-    .then(res => res.json())
-    .then(data => {
-
-      const box = document.getElementById("suggestions");
-      box.innerHTML = "";
-
-      if (!data.data) return;
-
-      data.data.forEach(name => {
-
-        const div = document.createElement("div");
-        div.className = "suggestion";
-        div.innerText = name;
-
-        div.onclick = () => loadCard(name);
-
-        box.appendChild(div);
-      });
-
-    })
-    .catch(err => console.error("❌ Autocomplete Fehler:", err));
-});
-
-
-// 🎴 KARTE LADEN
-function loadCard(name) {
-
-  console.log("🎴 Lade Karte:", name);
-
-  const results = document.getElementById("results");
-  results.innerHTML = "<p>Lade Karte...</p>";
-
-  fetch("https://api.scryfall.com/cards/named?fuzzy=" + encodeURIComponent(name))
-    .then(res => res.json())
-    .then(card => {
-
-      let image = "";
-      let text = "Kein Text verfügbar";
-      let type = card.type_line || "";
-
-      // ✅ Bild
-      if (card.image_uris && card.image_uris.normal) {
-        image = card.image_uris.normal;
-      } else if (card.card_faces && card.card_faces[0]?.image_uris) {
-        image = card.card_faces[0].image_uris.normal;
-      }
-
-      // ✅ Text
-      if (card.oracle_text) {
-        text = card.oracle_text;
-      } else if (card.card_faces && card.card_faces[0]) {
-        text = card.card_faces[0].oracle_text || text;
-      }
-
-      results.innerHTML = `
-        <div class="card">
-          ${image ? `<img src="${image}" width="250"><br><br>` : "<p>Kein Bild</p>"}
-          <h2>${card.name}</h2>
-          <p>${type}</p>
-          <p style="white-space: pre-line;">${text}</p>
-        </div>
-      `;
-    })
-    .catch(err => {
-      console.error("❌ Fehler beim Laden:", err);
-      results.innerHTML = "<p>Fehler beim Laden</p>";
-    });
-}
-
-</script>
-
-</body>
-</html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>MTG Card Finder</title>
+<title>MTG Combo Finder</title>
 
 <style>
 body {
@@ -117,10 +10,6 @@ body {
   color: white;
   font-family: Arial;
   text-align: center;
-}
-
-h1 {
-  margin-top: 20px;
 }
 
 input {
@@ -148,3 +37,156 @@ input {
 
 .card {
   background: #1e293b;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 500px;
+}
+
+/* COMBOS */
+.combo {
+  background: #1e293b;
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 500px;
+  border: 1px solid #334155;
+}
+</style>
+
+</head>
+<body>
+
+<h1>🧙 MTG Combo Finder</h1>
+
+<input id="search" placeholder="Kartennamen...">
+
+<div id="suggestions"></div>
+<div id="results"></div>
+<div id="combos"></div>
+
+<script>
+
+// ✅ COMBO DATENBANK
+const combos = [
+  {
+    name: "Heliod + Walking Ballista",
+    cards: ["Heliod, Sun-Crowned", "Walking Ballista"],
+    effect: "Unendlicher Schaden",
+    how: "Gib Ballista Lifeline → Schaden → Leben → Marke zurück → wiederholen"
+  },
+  {
+    name: "Thassa's Oracle Combo",
+    cards: ["Thassa's Oracle", "Demonic Consultation"],
+    effect: "Sofortiger Sieg",
+    how: "Exile dein Deck → spiele Oracle → gewinne"
+  },
+  {
+    name: "Devoted Druid Combo",
+    cards: ["Devoted Druid", "Vizier of Remedies"],
+    effect: "Unendlich Mana",
+    how: "Druid tap → enttappen ohne Counter → repeat"
+  }
+];
+
+
+// 🔎 AUTOCOMPLETE
+document.getElementById("search").addEventListener("input", function() {
+
+  const query = this.value;
+
+  if (query.length < 2) {
+    document.getElementById("suggestions").innerHTML = "";
+    return;
+  }
+
+  fetch("https://api.scryfall.com/cards/autocomplete?q=" + encodeURIComponent(query))
+    .then(res => res.json())
+    .then(data => {
+
+      const box = document.getElementById("suggestions");
+      box.innerHTML = "";
+
+      if (!data.data) return;
+
+      data.data.forEach(name => {
+
+        const div = document.createElement("div");
+        div.className = "suggestion";
+        div.innerText = name;
+
+        div.onclick = () => loadCard(name);
+
+        box.appendChild(div);
+      });
+
+    });
+});
+
+
+// 🎴 KARTE LADEN
+function loadCard(name) {
+
+  document.getElementById("suggestions").innerHTML = "";
+  document.getElementById("combos").innerHTML = "";
+
+  fetch("https://api.scryfall.com/cards/named?fuzzy=" + encodeURIComponent(name))
+    .then(res => res.json())
+    .then(card => {
+
+      let image = card.image_uris?.normal ||
+                  card.card_faces?.[0]?.image_uris?.normal || "";
+
+      let text = card.oracle_text ||
+                 card.card_faces?.[0]?.oracle_text ||
+                 "Kein Text verfügbar";
+
+      let type = card.type_line || "";
+
+      document.getElementById("results").innerHTML = `
+        <div class="card">
+          ${image ? `<img src="${image}" width="250    <h2>${card.name}</h2>
+          <p>${type}</p>
+          <p style="white-space: pre-line;">${text}</p>
+        </div>
+      `;
+
+      // 👉 COMBOS anzeigen
+      showCombos(card.name);
+
+    });
+}
+
+
+// 🔥 COMBO SUCHE
+function showCombos(cardName) {
+
+  const comboBox = document.getElementById("combos");
+  comboBox.innerHTML = "<h2>Passende Combos:</h2>";
+
+  let found = combos.filter(c =>
+    c.cards.includes(cardName)
+  );
+
+  if (found.length === 0) {
+    comboBox.innerHTML += "<p>Keine Combos gefunden 😢</p>";
+    return;
+  }
+
+  found.forEach(c => {
+    comboBox.innerHTML += `
+      <div class="combo">
+        <h3>${c.name}</h3>
+        <p><b>Karten:</b> ${c.cards.join(", ")}</p>
+        <p><b>Effekt:</b> ${c.effect}</p>
+        <p><b>So funktioniert es:</b> ${c.how}</p>
+      </div>
+    `;
+  });
+}
+
+</script>
+
+</body>
+</html>
+``
