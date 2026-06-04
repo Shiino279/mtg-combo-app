@@ -1,7 +1,8 @@
 <script>
+// 💾 RECENT LADEN
 let recentCards = JSON.parse(localStorage.getItem("recentCards")) || [];
 
-// 🔁 RECENT SYSTEM
+// 🔁 RECENT
 function addRecent(cardName) {
   recentCards = recentCards.filter(c => c !== cardName);
   recentCards.unshift(cardName);
@@ -12,76 +13,75 @@ function addRecent(cardName) {
   renderRecent();
 }
 
+// 📺 RECENT anzeigen
 function renderRecent() {
-  const container = document.getElementById("recent");
+  let container = document.getElementById("recent");
   container.innerHTML = "";
 
   recentCards.forEach(card => {
     container.innerHTML += `
       <img src="https://api.scryfall.com/cards/named?exact=${card}&format=image"
-      onclick="searchCard('${card function autoComplete() {
-  const query = document.getElementById("search").value;
+      onclick="searchCard('${card}')tabil)
+function autoComplete() {
+  let query = document.getElementById("search").value;
 
   if (query.length < 2) {
     document.getElementById("suggestions").innerHTML = "";
     return;
   }
 
-  try {
-    const res = await fetch(`https://api.scryfall.com/cards/autocomplete?q=${query}`);
-    const data = await res.json();
+  fetch("https://api.scryfall.com/cards/autocomplete?q=" + query)
+    .then(res => res.json())
+    .then(data => {
+      let suggestions = document.getElementById("suggestions");
+      suggestions.innerHTML = "";
 
-    const suggestions = document.getElementById("suggestions");
-    suggestions.innerHTML = "";
+      if (!data.data) return;
 
-    if (!data.data) return;
-
-    data.data.forEach(name => {
-      const item = document.createElement("div");
-      item.className = "suggestion";
-      item.innerText = name;
-      item.onclick = () => searchCard(name);
-
-      suggestions.appendChild(item);
+      data.data.forEach(function(name) {
+        suggestions.innerHTML += `
+          <div class="suggestion" onclick="searchCard('${name}')">
+            ${name}
+          </div>
+        `;
+      });
+    })
+    .catch(() => {
+      console.log("Autocomplete Fehler");
     });
-
-  } catch (err) {
-    console.log("Fehler bei Autocomplete:", err);
-  }
 }
 
-// 🎴 KARTEN LADEN FIX
-async function searchCard(cardName) {
+// 🎴 KARTENSUCHE (fix)
+function searchCard(cardName) {
   document.getElementById("suggestions").innerHTML = "";
 
-  try {
-    const res = await fetch(`https://api.scryfall.com/cards/named?fuzzy=${cardName}`);
-    const card = await res.json();
+  fetch("https://api.scryfall.com/cards/named?fuzzy=" + cardName)
+    .then(res => res.json())
+    .then(card => {
 
-    const results = document.getElementById("results");
+      let image = "";
+      if (card.image_uris) {
+        image = card.image_uris.normal;
+      }
 
-    // FALLBACK falls kein Bild existiert
-    let image = card.image_uris ? card.image_uris.normal : "";
-
-    results.innerHTML = `
-      <div class="card">
-        <img src="${image}"iv class="content">
-          <h2>${card.name}</h2>
-          <p>${card.type_line || ""}</p>
-          <p>${card.oracle_text || ""}</p>
+      document.getElementById("results").innerHTML = `
+        <div class="card">
+          <img src="${       <div class="content">
+            <h2>${card.name}</h2>
+            <p>${card.type_line || ""}</p>
+            <p>${card.oracle_text || ""}</p>
+          </div>
         </div>
-      </div>
-    `;
+      `;
 
-    addRecent(card.name);
-
-  } catch (err) {
-    document.getElementById("results").innerHTML =
-      "<p class='empty'>Fehler beim Laden der Karte 😢</p>";
-  }
+      addRecent(card.name);
+    })
+    .catch(() => {
+      document.getElementById("results").innerHTML =
+        "<p class='empty'>Fehler beim Laden 😢</p>";
+    });
 }
 
 // INIT
 renderRecent();
 </script>
-``
