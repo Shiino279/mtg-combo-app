@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -8,30 +7,111 @@
 <style>
 body { margin:0; font-family:"Segoe UI",sans-serif; background:#020617; color:white; text-align:center; }
 h1 { margin-top:40px; color:#f97316; }
-.container { display:flex; justify-content:center; margin-top:60px; }
-.card { width:300px; height:420px; perspective:1000px; cursor:pointer; }
-.inner { width:100%; height:100%; transition:transform 0.8s; transform-style:preserve-3d; position:relative; }
-.card:hover .inner { transform: rotateY(180deg); }
-.front,.back { position:absolute; width:100%; height:100%; border-radius:15px; overflow:hidden; backface-visibility:hidden; }
-.front img { width:100%; height:100%; object-fit:cover; }
-.back { background:linear-gradient(135deg,#7c2d12,#1e293b); transform:rotateY(180deg); display:flex; flex-direction:column; justify-content:center; }
-.combo { background:#1e293b; margin:10px auto; padding:15px; border-radius:10px; max-width:600px; cursor:pointer; }
-.cardView { background:#1e293b; padding:20px; margin:20px; border-radius:10px; text-align:left; }
 
+.container { display:flex; justify-content:center; margin-top:60px; }
+
+.card {
+  width:300px;
+  height:420px;
+  perspective:1000px;
+  cursor:pointer;
+}
+
+.inner {
+  width:100%; height:100%;
+  transition:transform 0.8s;
+  transform-style:preserve-3d;
+  position:relative;
+}
+
+.card:hover .inner { transform: rotateY(180deg); }
+
+.front,.back {
+  position:absolute;
+  width:100%; height:100%;
+  border-radius:15px;
+  overflow:hidden;
+  backface-visibility:hidden;
+}
+
+.front img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.back {
+  background:linear-gradient(135deg,#7c2d12,#1e293b);
+  transform:rotateY(180deg);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.combo {
+  background:#1e293b;
+  margin:10px auto;
+  padding:15px;
+  border-radius:10px;
+  max-width:600px;
+  cursor:pointer;
+}
+
+.cardView {
+  background:#1e293b;
+  padding:20px;
+  margin:20px;
+  border-radius:10px;
+  text-align:left;
+}
+
+/* Animation */
 .cardImages { display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; }
-.cardImages img { width:140px; border-radius:10px; opacity:0; transform:translateY(20px); animation:fadeInUp 0.6s forwards; }
+
+.cardImages img {
+  width:140px;
+  border-radius:10px;
+  opacity:0;
+  transform:translateY(20px);
+  animation:fadeInUp 0.6s forwards;
+}
+
 .cardImages img:nth-child(1) { animation-delay:0.2s; }
 .cardImages img:nth-child(3) { animation-delay:0.6s; }
 
-@keyframes fadeInUp { to { opacity:1; transform:translateY(0); } }
+@keyframes fadeInUp {
+  to { opacity:1; transform:translateY(0); }
+}
 
-.arrow { font-size:28px; color:#f97316; opacity:0; animation:arrowPulse 1s infinite alternate, fadeIn 0.5s forwards; animation-delay:0.3s; }
+.arrow {
+  font-size:28px;
+  color:#f97316;
+  opacity:0;
+  animation:arrowPulse 1s infinite alternate, fadeIn 0.5s forwards;
+}
 
-@keyframes arrowPulse { from { transform:scale(1); opacity:0.6; } to { transform:scale(1.2); opacity:1; } }
-@keyframes fadeIn { to { opacity:1; } }
+@keyframes arrowPulse {
+  from { transform:scale(1); opacity:0.6; }
+  to { transform:scale(1.2); opacity:1; }
+}
 
-button { padding:10px; background:#f97316; border:none; border-radius:8px; color:white; cursor:pointer; }
-.mana { width:20px; vertical-align:middle; }
+@keyframes fadeIn {
+  to { opacity:1; }
+}
+
+button {
+  padding:10px;
+  background:#f97316;
+  border:none;
+  border-radius:8px;
+  color:white;
+  cursor:pointer;
+}
+
+.mana {
+  width:20px;
+  vertical-align:middle;
+}
 </style>
 </head>
 
@@ -42,9 +122,12 @@ button { padding:10px; background:#f97316; border:none; border-radius:8px; color
 <div id="homePage" class="container">
   <div class="card" onclick="openDeck()">
     <div class="inner">
+
+      <!-- ✅ FIXED IMAGE -->
       <div class="front">
-        azula.jpg
+        <img src="azula.jpg">
       </div>
+
       <div class="back">
         <h2>Azula Deck</h2>
         <p>Combos:</p>
@@ -71,34 +154,88 @@ button { padding:10px; background:#f97316; border:none; border-radius:8px; color
 <script>
 
 const combos = [
+
+  /* 🔥 1. COMET COMBO */
   {
     name: "Hellkite + Sozin's Comet",
     cards: ["Hellkite Charger", "Sozin's Comet"],
     text: `
 <b>Startzustand:</b><br>
-- Hellkite Charger im Spiel.<br>
-- Sozin's Comet in Hand oder Exil.<br><br>
+- Hellkite Charger liegt im Spiel.<br>
+- Sozin's Comet ist auf der Hand oder im Exil (Foretell vorbereitet).<br><br>
 
-<b>Mana:</b><br>
+<b>Voraussetzungen:</b><br>
+- Du kontrollierst eine weitere Kreatur, die angreifen kann.<br>
+- Ein Gegner kann deine Kreaturen nicht blocken.<br><br>
+
+<b>Benötigtes Mana:</b><br>
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/3.svg">
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
 <img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"><br><br>
 
+<div class="steps">
+<b>Ablauf:</b>
+<ol>
+<li>Wirke Sozin's Comet aus Hand ({3}{R}{R}) oder Exil ({2}{R}).</li>
+<li>Alle Kreaturen erhalten Firebending 5.</li>
+<li>Greife mit Hellkite Charger + weiterer Kreatur an.</li>
+<li>Firebending erzeugt mehrfach rotes Mana.</li>
+<li>Zahle 
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/5.svg">
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
+für Hellkite Charger.</li>
+<li>Alle Kreaturen enttappen + neue Combat Phase.</li>
+<li>Wiederhole unendlich.</li>
+</ol>
+</div>
+
 <b>Ergebnis:</b><br>
-- Infinite Combats
+- Unendlich Combat Phasen<br>
+- Unendlich rotes Mana<br>
+- Unendlich Schaden
 `
   },
+
+  /* 🔥 2. STUDENT COMBO */
   {
     name: "Hellkite + Firebending Student",
     cards: ["Hellkite Charger", "Firebending Student"],
     text: `
 <b>Startzustand:</b><br>
-- Beide im Spiel<br><br>
+- Beide Kreaturen im Spiel.<br>
+- Firebending Student hat Stärke ≥7 und keine Summoning Sickness.<br><br>
+
+<b>Voraussetzungen:</b><br>
+- Gegner kann nicht blocken.<br><br>
+
+<b>Benötigtes Mana:</b><br>
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/5.svg">
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"><br><br>
+
+<div class="steps">
+<b>Ablauf:</b>
+<ol>
+<li>Greife mit beiden Kreaturen an.</li>
+<li>Beide Trigger gehen auf den Stack.</li>
+<li>Firebending Student erzeugt rotes Mana basierend auf Stärke.</li>
+<li>Zahle 
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/5.svg">
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">.</li>
+<li>Alle Kreaturen enttappen + neue Combat Phase.</li>
+<li>Wiederhole unendlich.</li>
+</ol>
+</div>
 
 <b>Ergebnis:</b><br>
-- Infinite Combats
+- Unendlich Combat Phasen<br>
+- Unendlich rotes Mana<br>
+- Unendlich Schaden
 `
   }
+
 ];
 
 document.getElementById("comboCount").innerText = combos.length;
@@ -127,7 +264,9 @@ function openCombo(index) {
 
   combo.cards.forEach((card, i) => {
     const imageURL = `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card)}&format=image`;
-    cardsHTML += `<img src="${imageURL}">`;
+
+    cardsmageURL}`;
+
     if (i < combo.cards.length - 1) {
       cardsHTML += `<span class="arrow">➜</span>`;
     }
