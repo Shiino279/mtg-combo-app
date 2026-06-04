@@ -81,6 +81,7 @@ h1 {
   padding: 20px;
   margin: 20px;
   border-radius: 10px;
+  text-align: left;
 }
 
 .cardImages {
@@ -114,7 +115,7 @@ button {
   <div class="card" onclick="openDeck()">
     <div class="inner">
      <div class="front">
-        <img src="azula.jpg" alt="Azula">
+       <img src="azula.jpg">
       </div>
       <div class="back">
         <h2>Azula Deck</h2>
@@ -145,7 +146,31 @@ const combos = [
   {
     name: "Hellkite + Firebending Student",
     cards: ["Hellkite Charger", "Firebending Student"],
-    text: "Aggressive Combo mit zusätzlichen Combat Möglichkeiten und steigender Stärke"
+    text: `
+<b>Startzustand:</b><br>
+- Hellkite Charger liegt im Spiel.<br>
+- Sozin's Comet ist auf der Hand oder im Exil (Foretell vorbereitet).<br><br>
+
+<b>Voraussetzungen:</b><br>
+- Du kontrollierst eine weitere angreifende Kreatur.<br>
+- Ein Gegner kann deine Kreaturen nicht blocken.<br><br>
+
+<b>Benötigtes Mana:</b><br>
+- Bis zu {3}{R}{R} verfügbar.<br><br>
+
+<b>Ablauf:</b><br>
+1. Wirke Sozin's Comet aus der Hand ({3}{R}{R}) oder aus dem Exil ({2}{R}).<br>
+2. Alle deine Kreaturen erhalten Firebending 5 bis zum Ende des Zuges.<br>
+3. Greife mit Hellkite Charger und mindestens einer weiteren Kreatur an.<br>
+4. Jede Firebending-Fähigkeit erzeugt rotes Mana.<br>
+5. Zahle {5}{R}{R} für Hellkite Charger → enttappe Kreaturen und erhalte zusätzliche Kampfphase.<br>
+6. Wiederhole diesen Ablauf beliebig oft.<br><br>
+
+<b>Ergebnis:</b><br>
+- Unendlich Kampfphasen<br>
+- Unendlich rotes Mana<br>
+- Unendlich Schaden
+`
   }
 ];
 
