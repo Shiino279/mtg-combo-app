@@ -12,16 +12,11 @@ body {
   text-align: center;
 }
 
-h1 {
-  margin-top: 20px;
-}
-
 input {
   padding: 10px;
   width: 260px;
   border-radius: 8px;
   border: none;
-  margin-top: 10px;
 }
 
 #suggestions {
@@ -50,20 +45,34 @@ input {
 </style>
 
 </head>
-
 <body>
 
 <h1>🧙 MTG Card Finder</h1>
 
-<input id="search" placeholder="Kartennamen..." oninput="autoComplete()">
+<input id="search" placeholder="Kartennamen eingeben">
+
+<br><br>
+<button onclick="searchFromInput()">Suchen</button>
 
 <div id="suggestions"></div>
 <div id="results"></div>
 
 <script>
 
-function autoComplete() {
-  const query = document.getElementById("search").value;
+// ✅ Button Suche
+function searchFromInput() {
+  let value = document.getElementById("search").value;
+  if (value.length > 0) {
+    searchCard(value);
+  }
+}
+
+// ✅ Autocomplete beim Tippen
+document.getElementById("search").addEventListener("input", function() {
+  autoComplete(this.value);
+});
+
+function autoComplete(query) {
 
   if (query.length < 2) {
     document.getElementById("suggestions").innerHTML = "";
@@ -73,13 +82,15 @@ function autoComplete() {
   fetch("https://api.scryfall.com/cards/autocomplete?q=" + encodeURIComponent(query))
     .then(res => res.json())
     .then(data => {
-      const box = document.getElementById("suggestions");
-      box.innerHTML = "";
+
+      let suggestions = document.getElementById("suggestions");
+      suggestions.innerHTML = "";
 
       if (!data.data) return;
 
-      data.data.forEach(name => {
-        const div = document.createElement("div");
+      data.data.forEach(function(name) {
+
+        let div = document.createElement("div");
         div.className = "suggestion";
         div.innerText = name;
 
@@ -88,39 +99,65 @@ function autoComplete() {
           searchCard(name);
         };
 
-        box.appendChild(div);
+        suggestions.appendChild(div);
       });
-    });
+
+    })
+    .catch(err => console.log("Autocomplete Fehler:", err));
 }
 
+
+// ✅ Karte laden (MIT DEBUG!)
 function searchCard(name) {
 
+  console.log("Suche Karte:", name);
+
   document.getElementById("suggestions").innerHTML = "";
+  document.getElementById("results").innerHTML = "<p>Lade Karte...</p>";
 
   fetch("https://api.scryfall.com/cards/named?fuzzy=" + encodeURIComponent(name))
     .then(res => res.json())
     .then(card => {
 
-      let image = card.image_uris?.normal ||
-                  card.card_faces?.[0]?.image_uris?.normal || "";
+      console.log("API Antwort:", card);
 
-      let text = card.oracle_text ||
-                 card.card_faces?.[0]?.oracle_text ||
-                 "Kein Text verfügbar";
+      let image = "";
+      let text = "";
+      let type = "";
 
-      let type = card.type_line || "";
+      // ✅ Bild sicher holen
+      if (card.image_uris && card.image_uris.normal) {
+        image = card.image_uris.normal;
+      } else if (card.card_faces && card.card_faces[0] && card.card_faces[0].image_uris) {
+        image = card.card_faces[0].image_uris.normal;
+      } else {
+        image = "";
+      }
+
+      // ✅ Text sicher holen
+      if (card.oracle_text) {
+        text = card.oracle_text;
+      } else if (card.card_faces && card.card_faces[0]) {
+        text = card.card_faces[0].oracle_text || "";
+      } else {
+        text = "Kein Text verfügbar";
+      }
+
+      type = card.type_line || "";
 
       document.getElementById("results").innerHTML = `
         <div class="card">
-          ${image ? `<img src="${image}" width="h2>${card.name}</h2>
+          ${image ? `<img src="${image}" width="250 Bild</p>"}
+          <h2>${card.name}</h2>
           <p>${type}</p>
           <p style="white-space: pre-line;">${text}</p>
         </div>
       `;
     })
-    .catch(() => {
+    .catch(err => {
+      console.log("FEHLER:", err);
       document.getElementById("results").innerHTML =
-        "<p style='color:red'>Fehler beim Laden 😢</p>";
+        "<p style='color:red'>❌ Fehler beim Laden der Karte</p>";
     });
 }
 
