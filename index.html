@@ -48,7 +48,7 @@ button:hover {
   transform: scale(1.05);
 }
 
-/* Recent cards */
+/* RECENT */
 #recent {
   display: flex;
   gap: 10px;
@@ -68,11 +68,13 @@ button:hover {
   transform: scale(1.1);
 }
 
+/* CONTAINER */
 .container {
   max-width: 900px;
   margin: auto;
 }
 
+/* CARD */
 .card {
   display: flex;
   gap: 15px;
@@ -130,7 +132,7 @@ h2 {
   <button onclick="search()">Suchen</button>
 </div>
 
-<!-- 🔁 RECENT CARDS -->
+<!-- 🔁 Zuletzt angesehen -->
 <div id="recent"></div>
 
 <div class="container" id="results"></div>
@@ -158,10 +160,10 @@ function getImage(cardName) {
   return `https://api.scryfall.com/cards/named?exact=${cardName}&format=image`;
 }
 
-// 🔁 RECENT SYSTEM
-let recentCards = [];
+// 💾 RECENT SYSTEM (mit Speicherung)
+let recentCards = JSON.parse(localStorage.getItem("recentCards")) || [];
 
-// Karte hinzufügen
+// ➕ hinzufügen
 function addRecent(cardName) {
   recentCards = recentCards.filter(c => c !== cardName);
   recentCards.unshift(cardName);
@@ -170,10 +172,11 @@ function addRecent(cardName) {
     recentCards.pop();
   }
 
+  localStorage.setItem("recentCards", JSON.stringify(recentCards));
   renderRecent();
 }
 
-// Anzeige
+// 📺 anzeigen
 function renderRecent() {
   const container = document.getElementById("recent");
   container.innerHTML = "";
@@ -182,7 +185,8 @@ function renderRecent() {
     container.innerHTML += `
       <img 
         src="${getImage(card)}"
-        onclick="document.getElementById('search').value='${cardyId("search").value.toLowerCase();
+        onclick="document.getElementById('search').value='${card}'; search();"
+     toLowerCase();
   const results = document.getElementById("results");
 
   results.innerHTML = "";
@@ -198,12 +202,12 @@ function renderRecent() {
 
   filtered.forEach(c => {
 
-    // 🔁 Wichtig: letzte Karte merken
+    // 🔁 merken
     addRecent(c.cards[0]);
 
     results.innerHTML += `
       <div class="card">
-        <img src="${getImage(c.cards[0   <div class="content">
+        <img src="${getImage(c.cards[0])}"div class="content">
           <h2>${c.name}</h2>
           <p><b>Karten:</b> ${c.cards.join(", ")}</p>
           <p>${c.description}</p>
@@ -219,6 +223,9 @@ function renderRecent() {
     `;
   });
 }
+
+// 👉 Beim Laden anzeigen
+renderRecent();
 </script>
 
 </body>
