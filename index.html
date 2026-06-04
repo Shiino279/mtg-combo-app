@@ -1,131 +1,11 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<title>MTG Combo Finder Pro</title>
-
-<style>
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: radial-gradient(circle at top, #020617, #0f172a);
-  color: white;
-}
-
-h1 {
-  text-align: center;
-  padding: 25px;
-  font-size: 34px;
-  background: linear-gradient(90deg, #22c55e, #4f46e5);
-  -webkit-background-clip: text;
-  color: transparent;
-}
-
-.search {
-  text-align: center;
-  margin: 10px;
-  position: relative;
-}
-
-input {
-  padding: 12px;
-  width: 260px;
-  border-radius: 10px;
-  border: none;
-  background: #1e293b;
-  color: white;
-}
-
-/* AUTOCOMPLETE LISTE */
-#suggestions {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 260px;
-  background: #1e293b;
-  border-radius: 10px;
-  margin-top: 5px;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 10;
-}
-
-.suggestion {
-  padding: 10px;
-  cursor: pointer;
-}
-
-.suggestion:hover {
-  background: #334155;
-}
-
-/* RECENT */
-#recent {
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-  justify-content: center;
-  overflow-x: auto;
-}
-
-#recent img {
-  height: 80px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-/* RESULTS */
-.container {
-  max-width: 900px;
-  margin: auto;
-}
-
-.card {
-  display: flex;
-  gap: 15px;
-  background: rgba(30, 41, 59, 0.7);
-  margin: 20px;
-  padding: 20px;
-  border-radius: 18px;
-}
-
-.card img {
-  width: 120px;
-  border-radius: 10px;
-}
-
-.content {
-  flex: 1;
-}
-
-.empty {
-  text-align: center;
-  color: #64748b;
-}
-</style>
-</head>
-
-<body>
-
-<h1>🧙‍♂️ MTG Combo Finder</h1>
-
-<div class="search">
-  <input id="search" placeholder="Kartennamen..." oninput="autoComplete()" />
-  <div id="suggestions"></div>
-</div>
-
-<!-- RECENT -->
-<div id="recent"></div>
-
-<div class="container" id="results"></div>
-
 <script>
 let recentCards = JSON.parse(localStorage.getItem("recentCards")) || [];
 
-// 🔁 RECENT
+// 🔁 RECENT SYSTEM
 function addRecent(cardName) {
   recentCards = recentCards.filter(c => c !== cardName);
   recentCards.unshift(cardName);
+
   if (recentCards.length > 5) recentCards.pop();
 
   localStorage.setItem("recentCards", JSON.stringify(recentCards));
@@ -139,7 +19,7 @@ function renderRecent() {
   recentCards.forEach(card => {
     container.innerHTML += `
       <img src="https://api.scryfall.com/cards/named?exact=${card}&format=image"
-      onclick="searchCard('${card}')on autoComplete() {
+      onclick="searchCard('${card function autoComplete() {
   const query = document.getElementById("search").value;
 
   if (query.length < 2) {
@@ -147,48 +27,61 @@ function renderRecent() {
     return;
   }
 
-  const res = await fetch(`https://api.scryfall.com/cards/autocomplete?q=${query}`);
-  const data = await res.json();
+  try {
+    const res = await fetch(`https://api.scryfall.com/cards/autocomplete?q=${query}`);
+    const data = await res.json();
 
-  const suggestions = document.getElementById("suggestions");
-  suggestions.innerHTML = "";
+    const suggestions = document.getElementById("suggestions");
+    suggestions.innerHTML = "";
 
-  data.data.forEach(name => {
-    suggestions.innerHTML += `
-      <div class="suggestion" onclick="searchCard('${name}')">
-        ${name}
-      </div>
-    `;
-  });
+    if (!data.data) return;
+
+    data.data.forEach(name => {
+      const item = document.createElement("div");
+      item.className = "suggestion";
+      item.innerText = name;
+      item.onclick = () => searchCard(name);
+
+      suggestions.appendChild(item);
+    });
+
+  } catch (err) {
+    console.log("Fehler bei Autocomplete:", err);
+  }
 }
 
-// 🎴 KARTEN LADEN
+// 🎴 KARTEN LADEN FIX
 async function searchCard(cardName) {
   document.getElementById("suggestions").innerHTML = "";
 
-  const res = await fetch(`https://api.scryfall.com/cards/named?fuzzy=${cardName}`);
-  const card = await res.json();
+  try {
+    const res = await fetch(`https://api.scryfall.com/cards/named?fuzzy=${cardName}`);
+    const card = await res.json();
 
-  const results = document.getElementById("results");
+    const results = document.getElementById("results");
 
-  results.innerHTML = `
-    <div class="card">
-      <img src="${card.imageal}
-      <div class="content">
-        <h2>${card.name}</h2>
-        <p>${card.type_line}</p>
-        <p>${card.oracle_text || ""}</p>
+    // FALLBACK falls kein Bild existiert
+    let image = card.image_uris ? card.image_uris.normal : "";
+
+    results.innerHTML = `
+      <div class="card">
+        <img src="${image}"iv class="content">
+          <h2>${card.name}</h2>
+          <p>${card.type_line || ""}</p>
+          <p>${card.oracle_text || ""}</p>
+        </div>
       </div>
-    </div>
-  `;
+    `;
 
-  addRecent(card.name);
+    addRecent(card.name);
+
+  } catch (err) {
+    document.getElementById("results").innerHTML =
+      "<p class='empty'>Fehler beim Laden der Karte 😢</p>";
+  }
 }
 
 // INIT
 renderRecent();
 </script>
-
-</body>
-</html>
 ``
