@@ -62,10 +62,8 @@ h1 { margin-top:40px; color:#f97316; }
 
 .cardImages {
   display:flex;
-  align-items:center;
   justify-content:center;
   gap:10px;
-  flex-wrap:wrap;
 }
 
 .cardImages img {
@@ -88,10 +86,7 @@ button {
   cursor:pointer;
 }
 
-.mana {
-  width:20px;
-  vertical-align:middle;
-}
+.mana { width:20px; }
 </style>
 </head>
 
@@ -103,7 +98,7 @@ button {
   <div class="card" onclick="openDeck()">
     <div class="inner">
       <div class="front">
-        <img src="azula.jpg" alt="Azula">
+        <img src="azula.jpg">
       </div>
       <div class="back">
         <h2>Azula Deck</h2>
@@ -117,125 +112,50 @@ button {
 <div id="comboPage" style="display:none;">
   <h1>Azula Combos</h1>
   <div id="comboList"></div>
-  <br>
   <button onclick="goBack()">⬅ Zurück</button>
 </div>
 
 <div id="detailPage" style="display:none;">
   <h1 id="comboTitle"></h1>
   <div id="comboDetail"></div>
-  <br>
   <button onclick="backToCombos()">⬅ Zurück</button>
 </div>
 
 <script>
 
 const combos = [
-
 {
-name: "Hellkite + Sozin's Comet",
-cards: ["Hellkite Charger","Sozin's Comet"],
-text: `
-<b>Startzustand:</b><br>
-- Hellkite Charger im Spiel.<br>
-- Sozin's Comet auf der Hand oder im Exil (Foretell).<br><br>
-
-<b>Voraussetzungen:</b><br>
-- Weitere Kreatur kann angreifen.<br>
-- Gegner kann nicht blocken.<br><br>
-
-<b>Mana:</b><br>
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/3.svg">
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"><br><br>
-
-<div class="steps">
-<b>Ablauf:</b>
-<ol>
-<li>Wirke Sozin's Comet.</li>
-<li>Alle Kreaturen erhalten Firebending 5.</li>
-<li>Greife mit mehreren Kreaturen an.</li>
-<li>Erzeuge rotes Mana.</li>
-<li>Zahle 
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/5.svg">
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
-für Hellkite Charger.</li>
-<li>Neue Combat Phase.</li>
-<li>Wiederhole.</li>
-</ol>
-</div>
+name:"Hellkite + Sozin's Comet",
+cards:["Hellkite Charger","Sozin's Comet"],
+text:`<b>Startzustand:</b><br>
+- Hellkite Charger im Spiel<br>
+- Sozin's Comet auf der Hand oder im Exil<br><br>
 
 <b>Ergebnis:</b><br>
 - Unendlich Combat Phasen<br>
-- Unendlich rotes Mana<br>
-- Unendlich Schaden
-`
+- Unendlich Mana`
 },
 
 {
 name:"Hellkite + Firebending Student",
 cards:["Hellkite Charger","Firebending Student"],
-text:`
-<b>Startzustand:</b><br>
-- Beide Kreaturen im Spiel.<br>
-- Student ≥7 Stärke, keine Summoning Sickness.<br><br>
-
-<b>Voraussetzungen:</b><br>
-- Gegner kann nicht blocken.<br><br>
-
-<div class="steps">
-<b>Ablauf:</b>
-<ol>
-<li>Greife mit beiden an.</li>
-<li>Trigger gehen auf Stack.</li>
-<li>Student erzeugt Mana.</li>
-<li>Zahle Kosten für Hellkite.</li>
-<li>Neue Combat Phase.</li>
-<li>Wiederhole.</li>
-</ol>
-</div>
+text:`<b>Startzustand:</b><br>
+- Beide im Spiel<br><br>
 
 <b>Ergebnis:</b><br>
-- Unendlich Combat Phasen<br>
-- Unendlich Mana<br>
-- Unendlich Schaden
-`
+- Unendlich Combat Phasen`
 },
 
 {
 name:"Overkill + Jaws of Defeat",
 cards:["Overkill","Jaws of Defeat"],
-text:`
-<b>Startzustand:</b><br>
-- Overkill auf der Hand.<br>
-- Jaws of Defeat im Spiel.<br><br>
-
-<b>Voraussetzungen:</b><br>
-- Du kannst eine Kreatur ins Spiel bringen.<br><br>
-
-<b>Mana:</b><br>
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/2.svg">
-<img class="mana" src="https://svgs.scryfall.io/card-symbols/B.svg"><br><br>
-
-<div class="steps">
-<b>Ablauf:</b>
-<ol>
-<li>Kreatur kommt ins Spiel → Trigger.</li>
-<li>Wirke Overkill ({2}{B}).</li>
-<li>Kreatur bekommt -0/-9999.</li>
-<li>Kreatur stirbt.</li>
-<li>Trigger resolved.</li>
-<li>Gegner verliert extrem viel Leben.</li>
-</ol>
-</div>
+text:`<b>Startzustand:</b><br>
+- Overkill auf der Hand<br>
+- Jaws im Spiel<br><br>
 
 <b>Ergebnis:</b><br>
-- Gegner verliert das Spiel<br>
-- Nahezu unendlich Lifedrain
-`
+- Gegner verliert`
 }
-
 ];
 
 document.getElementById("comboCount").innerText = combos.length;
@@ -248,7 +168,7 @@ let list=document.getElementById("comboList");
 list.innerHTML="";
 
 combos.forEach((c,i)=>{
-list.innerHTML+=`<div class="combo" onclick="openCombo(${i})"><h3>${c.name}</h3></div>`;
+list.innerHTML+=`<div class="combo" onclick="openCombo(${i})">${c.name}</div>`;
 });
 }
 
@@ -260,18 +180,19 @@ document.getElementById("detailPage").style.display="block";
 
 document.getElementById("comboTitle").innerText=c.name;
 
-let cardsHTML="";
-
+let html="";
 c.cards.forEach((card,index)=>{
 let img=`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card)}&format=image`;
-cardsHTML+=`if(index<c.cards.length-1){
-cardsHTML+=`<span class="arrow">➜</span>`;
+html+=`${img}`;
+
+if(index<c.cards.length-1){
+html+=`<span class="arrow">➜</span>`;
 }
 });
 
 document.getElementById("comboDetail").innerHTML=
 `<div class="cardView">
-<div class="cardImages">${cardsHTML}</div><br>
+<div class="cardImages">${html}</div><br>
 ${c.text}
 </div>`;
 }
