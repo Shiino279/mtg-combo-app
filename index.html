@@ -1,39 +1,116 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
+  <meta charset="UTF-8">
   <title>MTG Combo Finder</title>
+
   <style>
     body {
-      background: #111;
-      color: white;
+      margin: 0;
       font-family: Arial;
-      text-align: center;
-      padding: 30px;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
     }
 
-    input, button {
-      padding: 10px;
-      margin: 5px;
+    header {
+      text-align: center;
+      padding: 30px;
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    .search-box {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+    }
+
+    input {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      width: 250px;
       font-size: 16px;
     }
 
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #22c55e;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #16a34a;
+      transform: scale(1.05);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
     .card {
-      background: #222;
-      padding: 15px;
-      margin: 10px;
+      background: rgba(30, 41, 59, 0.8);
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+    }
+
+    .title {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .label {
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .box {
+      background: #1e293b;
+      padding: 10px;
       border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    .warning {
+      color: #facc15;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+
+    .empty {
+      text-align: center;
+      color: #94a3b8;
+      margin-top: 20px;
     }
   </style>
 </head>
 
 <body>
 
-<h1>🧙 MTG Combo Finder</h1>
+<header>🧙 MTG Combo Finder</header>
 
-<input id="search" placeholder="Kartennamen eingeben">
-<button onclick="search()">Suchen</button>
+<div class="search-box">
+  <input id="search" placeholder="Kartennamen eingeben..." />
+  <button onclick="search()">Suchen</button>
+</div>
 
-<div id="results"></div>
+<div class="container" id="results"></div>
 
 <script>
 const combos = [
@@ -41,15 +118,15 @@ const combos = [
     name: "Heliod + Walking Ballista",
     cards: ["Heliod, Sun-Crowned", "Walking Ballista"],
     description: "Unendlicher Schaden",
-    how: "Gib Lifelink → Schaden → Leben → Marke zurück",
-    notes: "Mindestens 2 Marken"
+    how: "Gib Lifelink → Schaden → Leben → Marke zurück → wiederholen",
+    notes: "Mindestens 2 Marken nötig."
   },
   {
     name: "Thassa's Oracle Combo",
     cards: ["Thassa's Oracle", "Demonic Consultation"],
     description: "Sofortiger Sieg",
-    how: "Deck exilen → Oracle spielen",
-    notes: "Timing beachten"
+    how: "Deck exilen → Oracle spielen → gewinnen",
+    notes: "Timing auf Stack beachten"
   }
 ];
 
@@ -64,18 +141,26 @@ function search() {
   );
 
   if (filtered.length === 0) {
-    results.innerHTML = "<p>Keine Combos gefunden</p>";
+    results.innerHTML = "<p class='empty'>Keine Combos gefunden 😢</p>";
     return;
   }
 
   filtered.forEach(c => {
     results.innerHTML += `
       <div class="card">
-        <h2>${c.name}</h2>
-        <p><b>Karten:</b> ${c.cards.join(", ")}</p>
-        <p>${c.description}</p>
-        <p><b>So klappt's:</b> ${c.how}</p>
-        <p>${c.notes}</p>
+        <div class="title">${c.name}</div>
+        <div class="label">Karten:</div>
+        <div>${c.cards.join(", ")}</div>
+
+        <div class="label">Beschreibung:</div>
+        <div>${c.description}</div>
+
+        <div class="box">
+          <b>So funktioniert es:</b><br>
+          ${c.how}
+        </div>
+
+        <div class="warning">⚠️ ${c.notes}</div>
       </div>
     `;
   });
@@ -84,3 +169,4 @@ function search() {
 
 </body>
 </html>
+``
