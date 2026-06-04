@@ -7,70 +7,144 @@
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #0f172a, #020617);
+  font-family: 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at top, #1e293b, #020617);
   color: white;
 }
 
-h1 {
+/* HEADER */
+header {
   text-align: center;
+  padding: 30px;
+  font-size: 36px;
+  font-weight: bold;
+  background: linear-gradient(90deg, #22c55e, #4f46e5);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* SEARCH */
+.search-box {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
   padding: 20px;
 }
 
-/* Suche */
-.search {
-  text-align: center;
-  margin: 20px;
-}
-
 input {
-  padding: 10px;
-  width: 250px;
-  border-radius: 8px;
+  padding: 14px;
+  border-radius: 12px;
   border: none;
+  width: 260px;
+  font-size: 16px;
+  background: #0f172a;
+  color: white;
+  outline: none;
+  box-shadow: 0 0 10px rgba(34,197,94,0.3);
 }
 
 button {
-  padding: 10px;
-  border-radius: 8px;
+  padding: 14px 22px;
+  border-radius: 12px;
   border: none;
-  background: #22c55e;
+  background: linear-gradient(90deg, #22c55e, #4f46e5);
   color: white;
+  font-weight: bold;
   cursor: pointer;
+  transition: 0.2s;
 }
 
 button:hover {
-  background: #16a34a;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(34,197,94,0.7);
 }
 
-/* Karten */
+/* CONTAINER */
 .container {
-  max-width: 800px;
+  max-width: 950px;
   margin: auto;
+  padding: 20px;
 }
 
+/* CARD */
 .card {
-  background: #1e293b;
-  margin: 15px;
-  padding: 15px;
-  border-radius: 12px;
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  background: rgba(15, 23, 42, 0.6);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  transition: 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #22c55e, #4f46e5);
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.card:hover::before {
+  opacity: 0.1;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+}
+
+/* TITLES */
+.title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.label {
+  color: #94a3b8;
+  font-size: 13px;
 }
 
 .box {
   background: #020617;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 12px;
+  border-radius: 12px;
   margin-top: 10px;
+}
+
+.warning {
+  color: #facc15;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.empty {
+  text-align: center;
+  color: #64748b;
+  margin-top: 30px;
+}
+
+/* ANIMATION */
+.fade {
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(10px);}
+  to {opacity:1; transform:translateY(0);}
 }
 </style>
 </head>
 
 <body>
 
-<h1>🧙 MTG Combo Finder</h1>
+<header>🧙 MTG Combo Finder</header>
 
-<div class="search">
-  <input id="search" placeholder="Kartennamen eingeben">
+<div class="search-box">
+  <input id="search" placeholder="Kartennamen eingeben..." oninput="search()" />
   <button onclick="search()">Suchen</button>
 </div>
 
@@ -82,48 +156,50 @@ const combos = [
     name: "Heliod + Walking Ballista",
     cards: ["Heliod, Sun-Crowned", "Walking Ballista"],
     description: "Unendlicher Schaden",
-    how: "Gib Lifelink → Damage → Life → Counter zurück",
-    notes: "Mindestens 2 Marken"
+    how: "Gib Lifelink → Schaden → Leben → Marke zurück → wiederholen",
+    notes: "Mindestens 2 Marken nötig."
   },
   {
     name: "Thassa's Oracle Combo",
     cards: ["Thassa's Oracle", "Demonic Consultation"],
     description: "Sofortiger Sieg",
-    how: "Deck exilen → Oracle spielen",
-    notes: "Timing beachten"
+    how: "Deck exilen → Oracle spielen → gewinnen",
+    notes: "Timing auf Stack beachten"
   }
 ];
 
 function search() {
-  var input = document.getElementById("search").value.toLowerCase();
-  var results = document.getElementById("results");
+  const input = document.getElementById("search").value.toLowerCase();
+  const results = document.getElementById("results");
+
+  const filtered = combos.filter(c =>
+    c.cards.some(card => card.toLowerCase().includes(input))
+  );
 
   results.innerHTML = "";
 
-  var filtered = combos.filter(function(c) {
-    return c.cards.some(function(card) {
-      return card.toLowerCase().includes(input);
-    });
-  });
-
   if (filtered.length === 0) {
-    results.innerHTML = "<p>Keine Combos gefunden</p>";
+    results.innerHTML = "<p class='empty'>Keine Combos gefunden 😢</p>";
     return;
   }
 
-  filtered.forEach(function(c) {
+  filtered.forEach(c => {
     results.innerHTML += `
-      <div class="card">
-        <h2>${c.name}</h2>
-        <p><b>Karten:</b> ${c.cards.join(", ")}</p>
-        <p>${c.description}</p>
+      <div class="card fade">
+        <div class="title">${c.name}</div>
+
+        <div class="label">Karten</div>
+        <div>${c.cards.join(", ")}</div>
+
+        <div class="label">Beschreibung</div>
+        <div>${c.description}</div>
 
         <div class="box">
           <b>So funktioniert es:</b><br>
           ${c.how}
         </div>
 
-        <p>⚠️ ${c.notes}</p>
+        <div class="warning">⚠️ ${c.notes}</div>
       </div>
     `;
   });
@@ -132,4 +208,3 @@ function search() {
 
 </body>
 </html>
-``
