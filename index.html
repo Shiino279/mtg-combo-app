@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>MTG Combo Finder</title>
+<title>MTG Combo Finder Pro</title>
 
 <style>
 body {
@@ -24,6 +24,7 @@ h1 {
 .search {
   text-align: center;
   margin: 10px;
+  position: relative;
 }
 
 input {
@@ -35,17 +36,27 @@ input {
   color: white;
 }
 
-button {
-  padding: 12px;
+/* AUTOCOMPLETE LISTE */
+#suggestions {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  background: #1e293b;
   border-radius: 10px;
-  border: none;
-  background: linear-gradient(90deg, #22c55e, #4f46e5);
-  color: white;
+  margin-top: 5px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.suggestion {
+  padding: 10px;
   cursor: pointer;
 }
 
-button:hover {
-  transform: scale(1.05);
+.suggestion:hover {
+  background: #334155;
 }
 
 /* RECENT */
@@ -61,20 +72,14 @@ button:hover {
   height: 80px;
   border-radius: 8px;
   cursor: pointer;
-  transition: 0.2s;
 }
 
-#recent img:hover {
-  transform: scale(1.1);
-}
-
-/* CONTAINER */
+/* RESULTS */
 .container {
   max-width: 900px;
   margin: auto;
 }
 
-/* CARD */
 .card {
   display: flex;
   gap: 15px;
@@ -82,12 +87,6 @@ button:hover {
   margin: 20px;
   padding: 20px;
   border-radius: 18px;
-  backdrop-filter: blur(10px);
-  transition: 0.3s;
-}
-
-.card:hover {
-  transform: translateY(-6px);
 }
 
 .card img {
@@ -97,23 +96,6 @@ button:hover {
 
 .content {
   flex: 1;
-}
-
-h2 {
-  margin-top: 0;
-  color: #38bdf8;
-}
-
-.box {
-  background: #020617;
-  padding: 10px;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
-.warning {
-  color: #facc15;
-  font-size: 12px;
 }
 
 .empty {
@@ -128,105 +110,85 @@ h2 {
 <h1>🧙‍♂️ MTG Combo Finder</h1>
 
 <div class="search">
-  <input id="search" placeholder="Kartennamen..." oninput="search()" />
-  <button onclick="search()">Suchen</button>
+  <input id="search" placeholder="Kartennamen..." oninput="autoComplete()" />
+  <div id="suggestions"></div>
 </div>
 
-<!-- 🔁 Zuletzt angesehen -->
+<!-- RECENT -->
 <div id="recent"></div>
 
 <div class="container" id="results"></div>
 
 <script>
-const combos = [
-  {
-    name: "Heliod + Walking Ballista",
-    cards: ["Heliod, Sun-Crowned", "Walking Ballista"],
-    description: "Unendlicher Schaden",
-    how: "Gib Lifelink → Schaden → Leben → Marke zurück",
-    notes: "Mindestens 2 Marken nötig"
-  },
-  {
-    name: "Thassa's Oracle Combo",
-    cards: ["Thassa's Oracle", "Demonic Consultation"],
-    description: "Sofortiger Sieg",
-    how: "Deck exilen → Oracle spielen",
-    notes: "Timing beachten"
-  }
-];
-
-// 📷 Bild holen
-function getImage(cardName) {
-  return `https://api.scryfall.com/cards/named?exact=${cardName}&format=image`;
-}
-
-// 💾 RECENT SYSTEM (mit Speicherung)
 let recentCards = JSON.parse(localStorage.getItem("recentCards")) || [];
 
-// ➕ hinzufügen
+// 🔁 RECENT
 function addRecent(cardName) {
   recentCards = recentCards.filter(c => c !== cardName);
   recentCards.unshift(cardName);
-
-  if (recentCards.length > 5) {
-    recentCards.pop();
-  }
+  if (recentCards.length > 5) recentCards.pop();
 
   localStorage.setItem("recentCards", JSON.stringify(recentCards));
   renderRecent();
 }
 
-// 📺 anzeigen
 function renderRecent() {
   const container = document.getElementById("recent");
   container.innerHTML = "";
 
   recentCards.forEach(card => {
     container.innerHTML += `
-      <img 
-        src="${getImage(card)}"
-        onclick="document.getElementById('search').value='${card}'; search();"
-     toLowerCase();
-  const results = document.getElementById("results");
+      <img src="https://api.scryfall.com/cards/named?exact=${card}&format=image"
+      onclick="searchCard('${card}')on autoComplete() {
+  const query = document.getElementById("search").value;
 
-  results.innerHTML = "";
-
-  const filtered = combos.filter(c =>
-    c.cards.some(card => card.toLowerCase().includes(input))
-  );
-
-  if (filtered.length === 0) {
-    results.innerHTML = "<p class='empty'>Keine Combos gefunden 😢</p>";
+  if (query.length < 2) {
+    document.getElementById("suggestions").innerHTML = "";
     return;
   }
 
-  filtered.forEach(c => {
+  const res = await fetch(`https://api.scryfall.com/cards/autocomplete?q=${query}`);
+  const data = await res.json();
 
-    // 🔁 merken
-    addRecent(c.cards[0]);
+  const suggestions = document.getElementById("suggestions");
+  suggestions.innerHTML = "";
 
-    results.innerHTML += `
-      <div class="card">
-        <img src="${getImage(c.cards[0])}"div class="content">
-          <h2>${c.name}</h2>
-          <p><b>Karten:</b> ${c.cards.join(", ")}</p>
-          <p>${c.description}</p>
-
-          <div class="box">
-            <b>So funktioniert es:</b><br>
-            ${c.how}
-          </div>
-
-          <div class="warning">⚠️ ${c.notes}</div>
-        </div>
+  data.data.forEach(name => {
+    suggestions.innerHTML += `
+      <div class="suggestion" onclick="searchCard('${name}')">
+        ${name}
       </div>
     `;
   });
 }
 
-// 👉 Beim Laden anzeigen
+// 🎴 KARTEN LADEN
+async function searchCard(cardName) {
+  document.getElementById("suggestions").innerHTML = "";
+
+  const res = await fetch(`https://api.scryfall.com/cards/named?fuzzy=${cardName}`);
+  const card = await res.json();
+
+  const results = document.getElementById("results");
+
+  results.innerHTML = `
+    <div class="card">
+      <img src="${card.imageal}
+      <div class="content">
+        <h2>${card.name}</h2>
+        <p>${card.type_line}</p>
+        <p>${card.oracle_text || ""}</p>
+      </div>
+    </div>
+  `;
+
+  addRecent(card.name);
+}
+
+// INIT
 renderRecent();
 </script>
 
 </body>
 </html>
+``
