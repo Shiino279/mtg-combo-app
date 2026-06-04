@@ -1,168 +1,129 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<title>MTG Finder Pro</title>
+import React, { useState } from "react";import React, { use setSuggestions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #0f172a;
-  color: white;
-  text-align: center;
-}
+  // 🔎 Autocomplete (Liste beim Tippen)
+  const handleChange = async (value) => {
+    setCardName(value);
 
-input {
-  padding: 10px;
-  width: 250px;
-  margin-top: 20px;
-}
+    if (value.length < 2) {
+      setSuggestions([]);
+      return;
+    }
 
-#suggestions {
-  background: #1e293b;
-  width: 250px;
-  margin: auto;
-  max-height: 200px;
-  overflow-y: auto;
-}
+    try {
+      const res = await axios.get(
+        `https://api.scryfall.com/cards/autocomplete?q=${value}`
+      );
 
-.suggestion {
-  padding: 8px;
-  cursor: pointer;
-}
+      setSuggestions(res.data.data || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-.suggestion:hover {
-  background: #334155;
-}
+  // 🎴 Karte laden
+  const searchCard = async (name) => {
+    setLoading(true);
+    setSuggestions([]);
 
-#recent {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 10px;
-}
+    try {
+      const res = await axios.get(
+        `https://api.scryfall.com/cards/named?fuzzy=${name}`
+      );
 
-#recent img {
-  height: 80px;
-  cursor: pointer;
-  border-radius: 6px;
-}
+      setCard(res.data);
+    } catch (err) {
+      console.error(err);
+      setCard(null);
+    }
 
-.card {
-  background: #1e293b;
-  padding: 15px;
-  margin: 20px;
-}
-</style>
-</head>
+    setLoading(false);
+  };
 
-<body>
+  return (
+    <div className="min-h-screen bg-gray-900 text-white p-6">
+      <div className="max-w-3xl mx-auto">
 
-<h1>🧙 MTG Finder</h1>
+        <h1 className="text-4xl font-bold mb-6 text-center">
+          🧙 MTG Card Finder
+        </h1>
 
-<input id="search" placeholder="Karte suchen..." oninput="autoComplete()">
+        {/* 🔎 SEARCH */}
+        <div className="relative mb-6">
+          <input
+            className="w-full p-3 rounded-lg text-black"
+            placeholder="Kartennamen eingeben..."
+            value={cardName}
+            onChange={(e) => handleChange(e.target.value)}
+          />
 
-<div id="suggestions"></div>
-
-<!-- 🔁 letzte Karten -->
-<div id="recent"></div>
-
-<div id="result"></div>
-
-<script>
-
-// 💾 RECENT LADEN
-let recentCards = JSON.parse(localStorage.getItem("recentCards")) || [];
-
-// 🔁 RECENT HINZUFÜGEN
-function addRecent(cardName) {
-  recentCards = recentCards.filter(c => c !== cardName);
-  recentCards.unshift(cardName);
-
-  if (recentCards.length > 5) {
-    recentCards.pop();
-  }
-
-  localStorage.setItem("recentCards", JSON.stringify(recentCards));
-  renderRecent();
-}
-
-// 📺 RECENT ANZEIGEN
-function renderRecent() {
-  let container = document.getElementById("recent");
-  container.innerHTML = "";
-
-  recentCards.forEach(card => {
-    container.innerHTML += `
-      <img 
-        src="https://api.scryfall.com/cards/named?exact=${card}&format=image"
-        onclick="searchCard('${card}')"
-
-  let q = document.getElementById("search").value;
-
-  if (q.length < 2) {
-    document.getElementById("suggestions").innerHTML = "";
-    return;
-  }
-
-  fetch("https://api.scryfall.com/cards/autocomplete?q=" + q)
-    .then(res => res.json())
-    .then(data => {
-      let box = document.getElementById("suggestions");
-      box.innerHTML = "";
-
-      if (!data.data) return;
-
-      data.data.forEach(name => {
-        box.innerHTML += `
-          <div class="suggestion" onclick="searchCard('${name}')">
-            ${name}
-          </div>
-        `;
-      });
-    })
-    .catch(() => console.log("Autocomplete Fehler"));
-}
-
-// 🎴 KARTE LADEN (MIT FIX!)
-function searchCard(name) {
-  document.getElementById("suggestions").innerHTML = "";
-
-  fetch("https://api.scryfall.com/cards/named?fuzzy=" + name)
-    .then(res => res.json())
-    .then(card => {
-
-      // ✅ Bild Fix (für alle Karten)
-      let image = "";
-      if (card.image_uris) {
-        image = `<img src="${card.image_uris.normal}" widthf (card.card_faces) {
-        image = `<img src="${card.card_faces[0].image_uris.normal}" width="/ ✅ Text Fix
-      let text = card.oracle_text || "";
-      if (!text && card.card_faces) {
-        text = card.card_faces[0].oracle_text || "";
-      }
-
-      document.getElementById("result").innerHTML = `
-        <div class="card">
-          <h2>${card.name}</h2>
-          ${image}<br>
-          <p>${card.type_line}</p>
-          <p>${text}</p>
+          {/* AUTOCOMPLETE LISTE */}
+          {suggestions.length > 0 && (
+            <div className="absolute w-full bg-gray-800 mt-1 rounded-lg max-h-60 overflow-y-auto">
+              {suggestions.map((s, i) => (
+                <div
+                  key={i}
+                  className="p-2 cursor-pointer hover:bg-gray-700"
+                  onClick={() => searchCard(s)}
+                >
+                  {s}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      `;
 
-      addRecent(card.name);
-    })
-    .catch(() => {
-      document.getElementById("result").innerHTML = "Fehler beim Laden 😢";
-    });
+        {/* BUTTON */}
+        <div className="text-center mb-6">
+          <button
+            className="bg-green-500 px-6 py-2 rounded-lg"
+            onClick={() => searchCard(cardName)}
+          >
+            Suchen
+          </button>
+        </div>
+
+        {/* LOADING */}
+        {loading && <p className="text-center">Lade Karte...</p>}
+
+        {/* 🎴 CARD */}
+        {card && (
+          <div className="bg-gray-800 p-4 rounded-xl shadow-lg">
+
+            {/* Bild */}
+            {card.image_uris && (
+              <img
+                src={card.image_uris.normal}
+                alt={card.name}
+                className="rounded-xl mb-4 mx-auto"
+              />
+            )}
+
+            {/* Name */}
+            <h2 className="text-2xl font-bold mb-2 text-center">
+              {card.name}
+            </h2>
+
+            {/* Typ */}
+            <p className="text-gray-400 text-center mb-2">
+              {card.type_line}
+            </p>
+
+            {/* Effekt */}
+            <p className="text-sm whitespace-pre-line">
+              {card.oracle_text}
+            </p>
+
+          </div>
+        )}
+        
+      </div>
+    </div>
+  );
 }
+``
+import axios from "axios";
 
-// INIT
-renderRecent();
-
-</script>
-
-</body>
-</html>
+export default function App() {
+  const [cardName, setCardName] = useState("");
+  const [card, setCard] = useState(null);
