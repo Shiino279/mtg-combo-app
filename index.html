@@ -1,62 +1,6 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<title>MTG Card Finder</title>
-
-<style>
-body {
-  background: #0f172a;
-  color: white;
-  font-family: Arial;
-  text-align: center;
-}
-
-input {
-  padding: 10px;
-  width: 250px;
-  border-radius: 8px;
-  border: none;
-}
-
-#suggestions {
-  width: 250px;
-  margin: auto;
-  background: #1e293b;
-  border-radius: 8px;
-}
-
-.suggestion {
-  padding: 8px;
-  cursor: pointer;
-}
-
-.suggestion:hover {
-  background: #334155;
-}
-
-.card {
-  background: #1e293b;
-  margin: 20px auto;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 500px;
-}
-</style>
-</head>
-
-<body>
-
-<h1>🧙 MTG Card Finder</h1>
-
-<input id="search" placeholder="Kartennamen eingeben..." oninput="autoComplete()">
-
-<div id="suggestions"></div>
-<div id="results"></div>
-
 <script>
 
-// AUTOCOMPLETE
+// 🔎 AUTOCOMPLETE
 function autoComplete() {
   const query = document.getElementById("search").value;
 
@@ -65,50 +9,70 @@ function autoComplete() {
     return;
   }
 
-  fetch("https://api.scryfall.com/cards/autocomplete?q=" + query)
+  fetch("https://api.scryfall.com/cards/autocomplete?q=" + encodeURIComponent(query))
     .then(res => res.json())
     .then(data => {
       const box = document.getElementById("suggestions");
       box.innerHTML = "";
+
+      if (!data.data) return;
 
       data.data.forEach(name => {
         const div = document.createElement("div");
         div.className = "suggestion";
         div.innerText = name;
 
-        div.onclick = () => {
+        div.onclick = function() {
+          document.getElementById("search").value = name;
           searchCard(name);
         };
 
         box.appendChild(div);
       });
+    })
+    .catch(err => {
+      console.log("Autocomplete Fehler:", err);
     });
 }
 
-// KARTENSUCHE
+
+// 🎴 KARTE LADEN (FIXED VERSION)
 function searchCard(name) {
+
+  // Liste schließen
   document.getElementById("suggestions").innerHTML = "";
 
-  fetch("https://api.scryfall.com/cards/named?fuzzy=" + name)
+  fetch("https://api.scryfall.com/cards/named?fuzzy=" + encodeURIComponent(name))
     .then(res => res.json())
     .then(card => {
 
+      const results = document.getElementById("results");
+
+      // FALLBACKS (wichtig!)
       let image = "";
-      if (card.image_uris) {
+      if (card.image_uris && card.image_uris.normal) {
         image = card.image_uris.normal;
+      } else if (card.card_faces && card.card_faces[0].image_uris) {
+        image = card.card_faces[0].image_uris.normal;
       }
 
-      document.getElementById("results").innerHTML = `
+      let text = card.oracle_text || 
+                 (card.card_faces && card.card_faces[0].oracle_text) ||
+                 "Kein Text vorhanden";
+
+      results.innerHTML = `
         <div class="card">
-          <img src="${image}" width="250>${card.name}</h2>
+          ${image ? `<img src="${image}" width         <h2>${card.name}</h2>
           <p>${card.type_line || ""}</p>
-          <p>${card.oracle_text || ""}</p>
+          <p>${text}</p>
         </div>
       `;
+    })
+    .catch(err => {
+      console.log("Fehler:", err);
+      document.getElementById("results").innerHTML =
+        "<p style='color:red'>Karte konnte nicht geladen werden 😢</p>";
     });
 }
 
 </script>
-
-</body>
-</html>
