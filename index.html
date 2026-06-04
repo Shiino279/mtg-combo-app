@@ -19,6 +19,7 @@ input {
   border: none;
 }
 
+/* Vorschläge */
 #suggestions {
   width: 260px;
   margin: auto;
@@ -35,6 +36,7 @@ input {
   background: #334155;
 }
 
+/* Karte */
 .card {
   background: #1e293b;
   margin: 20px auto;
@@ -43,6 +45,7 @@ input {
   max-width: 500px;
 }
 
+/* Combos */
 .combo {
   background: #1e293b;
   margin: 10px auto;
@@ -60,8 +63,8 @@ input {
 <h1>🧙 MTG Combo Finder</h1>
 
 <input id="search" placeholder="Kartennamen eingeben...">
-<div id="suggestions"></div>
 
+<div id="suggestions"></div>
 <div id="results"></div>
 <div id="combos"></div>
 
@@ -71,6 +74,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const input = document.getElementById("search");
   const suggestions = document.getElementById("suggestions");
+  const results = document.getElementById("results");
+  const comboBox = document.getElementById("combos");
 
   // ✅ COMBO DATENBANK
   const combos = [
@@ -78,20 +83,26 @@ document.addEventListener("DOMContentLoaded", function () {
       name: "Heliod + Walking Ballista",
       cards: ["Heliod, Sun-Crowned", "Walking Ballista"],
       effect: "Unendlicher Schaden",
-      how: "Gib Ballista Lifeline → Schaden → Leben → repeat"
+      how: "Gib Lifelink → Schaden → Leben → Marken → wiederholen"
     },
     {
       name: "Thassa's Oracle Combo",
       cards: ["Thassa's Oracle", "Demonic Consultation"],
       effect: "Sofortiger Sieg",
       how: "Deck exilen → Oracle spielen → gewinnen"
+    },
+    {
+      name: "Devoted Druid Combo",
+      cards: ["Devoted Druid", "Vizier of Remedies"],
+      effect: "Unendlich Mana",
+      how: "Tap → enttappen → repeat"
     }
   ];
 
   // 🔎 AUTOCOMPLETE
   input.addEventListener("input", function () {
 
-    let query = input.value;
+    const query = input.value;
 
     if (query.length < 2) {
       suggestions.innerHTML = "";
@@ -108,10 +119,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         data.data.forEach(name => {
 
-          let div = document.createElement("div");
+          const div = document.createElement("div");
           div.className = "suggestion";
           div.innerText = name;
 
+          // ✅ FIX: setzt Input + lädt Karte
           div.onclick = function () {
             input.value = name;
             loadCard(name);
@@ -124,14 +136,14 @@ document.addEventListener("DOMContentLoaded", function () {
       .catch(() => {
         suggestions.innerHTML = "<p>Fehler</p>";
       });
-
   });
+
 
   // 🎴 KARTE LADEN
   function loadCard(name) {
 
-    document.getElementById("results").innerHTML = "<p>Lade Karte...</p>";
-    document.getElementById("combos").innerHTML = "";
+    results.innerHTML = "<p>Lade Karte...</p>";
+    comboBox.innerHTML = "";
     suggestions.innerHTML = "";
 
     fetch("https://api.scryfall.com/cards/named?fuzzy=" + encodeURIComponent(name))
@@ -143,45 +155,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let text = card.oracle_text ||
                    card.card_faces?.[0]?.oracle_text ||
-                   "Kein Text";
+                   "Kein Text verfügbar";
 
         let type = card.type_line || "";
 
-        document.getElementById("results").innerHTML = `
+        results.innerHTML = `
           <div class="card">
-            ${image ? `<img src="${image}" width           <h2>${card.name}</h2>
+            ${image ? `<img src="${image}" width="250      <h2>${card.name}</h2>
             <p>${type}</p>
             <p style="white-space: pre-line;">${text}</p>
           </div>
         `;
 
         showCombos(card.name);
+      })
+      .catch(() => {
+        results.innerHTML = "<p>Fehler beim Laden</p>";
       });
   }
 
-  // 🔥 COMBOS
+  // 🔥 COMBOS ANZEIGEN
   function showCombos(cardName) {
 
-    const comboBox = document.getElementById("combos");
+    const matches = combos.filter(c => c.cards.includes(cardName));
 
-    let results = combos.filter(c =>
-      c.cards.includes(cardName)
-    );
-
-    if (results.length === 0) {
-      comboBox.innerHTML = "<p>Keine Combos gefunden</p>";
+    if (matches.length === 0) {
+      comboBox.innerHTML = "<p>Keine Combos gefunden 😢</p>";
       return;
     }
 
     comboBox.innerHTML = "<h2>Combos:</h2>";
 
-    results.forEach(c => {
+    matches.forEach(c => {
       comboBox.innerHTML += `
         <div class="combo">
           <h3>${c.name}</h3>
-          <p>${c.cards.join(", ")}</p>
-          <p>${c.effect}</p>
-          <p>${c.how}</p>
+          <p><b>Karten:</b> ${c.cards.join(", ")}</p>
+          <p><b>Effekt:</b> ${c.effect}</p>
+          <p><b>So funktioniert es:</b> ${c.how}</p>
         </div>
       `;
     });
