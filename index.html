@@ -1,213 +1,161 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<title>Shiinos Combis</title>
 
-<style>
-body { margin:0; font-family:"Segoe UI",sans-serif; background:#020617; color:white; text-align:center; }
-h1 { margin-top:40px; color:#f97316; }
-
-.container { display:flex; justify-content:center; margin-top:60px; }
-
-.card { width:300px; height:420px; perspective:1000px; cursor:pointer; }
-
-.inner {
-  width:100%; height:100%;
-  transition:transform 0.8s;
-  transform-style:preserve-3d;
-  position:relative;
-}
-
-.card:hover .inner { transform: rotateY(180deg); }
-
-.front,.back {
-  position:absolute;
-  width:100%; height:100%;
-  border-radius:15px;
-  overflow:hidden;
-  backface-visibility:hidden;
-}
-
-.front img {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.back {
-  background:linear-gradient(135deg,#7c2d12,#1e293b);
-  transform:rotateY(180deg);
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-}
-
-.combo {
-  background:#1e293b;
-  margin:10px auto;
-  padding:15px;
-  border-radius:10px;
-  max-width:600px;
-  cursor:pointer;
-}
-
-.cardView {
-  background:#1e293b;
-  padding:20px;
-  margin:20px;
-  border-radius:10px;
-  text-align:left;
-}
-
-.cardImages {
-  display:flex;
-  justify-content:center;
-  gap:10px;
-}
-
-.cardImages img {
-  width:160px;
-  border-radius:12px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.6);
-}
-
-.arrow {
-  font-size:28px;
-  color:#f97316;
-}
-
-button {
-  padding:10px;
-  background:#f97316;
-  border:none;
-  border-radius:8px;
-  color:white;
-  cursor:pointer;
-}
-
-.mana { width:20px; }
-</style>
-</head>
-
-<body>
-
-<h1>🔥 Shiinos Combis 🔥</h1>
-
-<div id="homePage" class="container">
-  <div class="card" onclick="openDeck()">
-    <div class="inner">
-      <div class="front">
-        <img src="azula.jpg">
-      </div>
-      <div class="back">
-        <h2>Azula Deck</h2>
-        <p>Combos:</p>
-        <h2 id="comboCount"></h2>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="comboPage" style="display:none;">
-  <h1>Azula Combos</h1>
-  <div id="comboList"></div>
-  <button onclick="goBack()">⬅ Zurück</button>
-</div>
-
-<div id="detailPage" style="display:none;">
-  <h1 id="comboTitle"></h1>
-  <div id="comboDetail"></div>
-  <button onclick="backToCombos()">⬅ Zurück</button>
-</div>
-
+<!-- Komplettes Script mit Combos + Funktionen gefixt -->
 <script>
 
 const combos = [
-{
-name:"Hellkite + Sozin's Comet",
-cards:["Hellkite Charger","Sozin's Comet"],
-text:`<b>Startzustand:</b><br>
-- Hellkite Charger im Spiel<br>
-- Sozin's Comet auf der Hand oder im Exil<br><br>
+  {
+    name: "Hellkite + Sozin's Comet",
+    cards: ["Hellkite Charger", "Sozin's Comet"],
+    text: `
+<b>Startzustand:</b><br>
+- Hellkite Charger liegt im Spiel.<br>
+- Sozin's Comet ist auf der Hand oder im Exil (wurde zuvor vorhergesagt).<br><br>
+
+<b>Voraussetzungen:</b><br>
+- Du kontrollierst eine weitere Kreatur, die angreifen kann.<br>
+- Ein Gegner kann deine Kreaturen nicht blocken.<br><br>
+
+<b>Benötigtes Mana:</b><br>
+https://svgs.scryfall.io/card-symbols/3.svg
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg">
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/R.svg"><br><br>
+
+<div class="steps">
+<b>Ablauf:</b>
+<ol>
+<li>Wirke Sozin's Comet aus der Hand oder aus dem Exil.</li>
+<li>Alle Kreaturen erhalten Firebending 5.</li>
+<li>Greife mit Hellkite Charger und weiterer Kreatur an.</li>
+<li>Erzeuge rotes Mana durch Firebending.</li>
+<li>Zahle Kosten für Hellkite Charger.</li>
+<li>Neue Combat Phase.</li>
+<li>Wiederhole unendlich.</li>
+</ol>
+</div>
 
 <b>Ergebnis:</b><br>
-- Unendlich Combat Phasen<br>
-- Unendlich Mana`
-},
+- Unendlich viele Kampfphasen<br>
+- Unendlich rotes Mana<br>
+- Unendlich Kampfschaden
+`
+  },
 
-{
-name:"Hellkite + Firebending Student",
-cards:["Hellkite Charger","Firebending Student"],
-text:`<b>Startzustand:</b><br>
-- Beide im Spiel<br><br>
+  {
+    name: "Hellkite + Firebending Student",
+    cards: ["Hellkite Charger", "Firebending Student"],
+    text: `
+<b>Startzustand:</b><br>
+- Beide Karten im Spiel.<br>
+- Student ≥7 Stärke.<br><br>
+
+<b>Voraussetzungen:</b><br>
+- Gegner kann nicht blocken.<br><br>
+
+<div class="steps">
+<b>Ablauf:</b>
+<ol>
+<li>Greife mit beiden Kreaturen an.</li>
+<li>Trigger aktivieren.</li>
+<li>Mana erzeugen.</li>
+<li>Combat reset.</li>
+<li>Wiederhole unendlich.</li>
+</ol>
+</div>
 
 <b>Ergebnis:</b><br>
-- Unendlich Combat Phasen`
-},
+- Unendlich viele Kampfphasen<br>
+- Unendlich rotes Mana<br>
+- Unendlicher Schaden
+`
+  },
 
-{
-name:"Overkill + Jaws of Defeat",
-cards:["Overkill","Jaws of Defeat"],
-text:`<b>Startzustand:</b><br>
-- Overkill auf der Hand<br>
-- Jaws im Spiel<br><br>
+  {
+    name: "Overkill + Jaws of Defeat",
+    cards: ["Overkill", "Jaws of Defeat"],
+    text: `
+<b>Startzustand:</b><br>
+- Overkill ist auf der Hand.<br>
+- Jaws of Defeat liegt im Spiel.<br><br>
+
+<b>Voraussetzungen:</b><br>
+- Du hast eine Möglichkeit, eine Kreatur ins Spiel zu bringen.<br><br>
+
+<b>Benötigtes Mana:</b><br>
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/2.svg">
+<img class="mana" src="https://svgs.scryfall.io/card-symbols/B.svg"><br><br>
+
+<div class="steps">
+<b>Ablauf:</b>
+<ol>
+<li>Lasse eine Kreatur ins Spiel kommen und triggere Jaws of Defeat.</li>
+<li>Halte Priorität und wirke Overkill für <img class="mana" src="https://svgs.scryfall.io/card-symbols/2.svg"> <img class="mana" src="https://svgs.scryfall.io/card-symbols/B.svg">.</li>
+<li>Die Kreatur erhält -0/-9999 bis zum Ende des Zuges.</li>
+<li>Die Kreatur stirbt aufgrund von 0 oder weniger Widerstandskraft.</li>
+<li>Der Trigger von Jaws of Defeat wird verrechnet.</li>
+<li>Ein Gegner verliert Leben entsprechend der Differenz von Stärke und Widerstandskraft.</li>
+</ol>
+</div>
 
 <b>Ergebnis:</b><br>
-- Gegner verliert`
-}
+- Zielgegner verliert das Spiel<br>
+- Nahezu unendlicher Lebensverlust beim Gegner
+`
+  }
 ];
 
 document.getElementById("comboCount").innerText = combos.length;
 
-function openDeck(){
-document.getElementById("homePage").style.display="none";
-document.getElementById("comboPage").style.display="block";
+function openDeck() {
+  document.getElementById("homePage").style.display = "none";
+  document.getElementById("comboPage").style.display = "block";
 
-let list=document.getElementById("comboList");
-list.innerHTML="";
+  const list = document.getElementById("comboList");
+  list.innerHTML = "";
 
-combos.forEach((c,i)=>{
-list.innerHTML+=`<div class="combo" onclick="openCombo(${i})">${c.name}</div>`;
-});
+  combos.forEach((c, index) => {
+    list.innerHTML += `<div class="combo" onclick="openCombo(${index})"><h3>${c.name}</h3></div>`;
+  });
 }
 
-function openCombo(i){
-let c=combos[i];
+function openCombo(index) {
+  const combo = combos[index];
 
-document.getElementById("comboPage").style.display="none";
-document.getElementById("detailPage").style.display="block";
+  document.getElementById("comboPage").style.display = "none";
+  document.getElementById("detailPage").style.display = "block";
 
-document.getElementById("comboTitle").innerText=c.name;
+  document.getElementById("comboTitle").innerText = combo.name;
 
-let html="";
-c.cards.forEach((card,index)=>{
-let img=`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card)}&format=image`;
-html+=`${img}`;
+  let cardsHTML = "";
 
-if(index<c.cards.length-1){
-html+=`<span class="arrow">➜</span>`;
+  combo.cards.forEach((card, i) => {
+    const imageURL = `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card)}&format=image`;
+
+    cardsHTML += `<img src="${imageURL}">`;
+
+    if (i < combo.cards.length - 1) {
+      cardsHTML += `<span class="arrow">➜</span>`;
+    }
+  });
+
+  document.getElementById("comboDetail").innerHTML = `
+    <div class="cardView">
+      <h3>Karten:</h3>
+      <div class="cardImages">${cardsHTML}</div>
+      <br>
+      <h3>Beschreibung:</h3>
+      <p>${combo.text}</p>
+    </div>
+  `;
 }
-});
 
-document.getElementById("comboDetail").innerHTML=
-`<div class="cardView">
-<div class="cardImages">${html}</div><br>
-${c.text}
-</div>`;
+function goBack() {
+  document.getElementById("homePage").style.display = "flex";
+  document.getElementById("comboPage").style.display = "none";
 }
 
-function goBack(){
-document.getElementById("homePage").style.display="flex";
-document.getElementById("comboPage").style.display="none";
-}
-
-function backToCombos(){
-document.getElementById("detailPage").style.display="none";
-document.getElementById("comboPage").style.display="block";
+function backToCombos() {
+  document.getElementById("detailPage").style.display = "none";
+  document.getElementById("comboPage").style.display = "block";
 }
 
 </script>
-
-</body>
-</html>
