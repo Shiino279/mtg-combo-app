@@ -19,7 +19,6 @@ input {
   border: none;
 }
 
-/* Vorschläge */
 #suggestions {
   width: 260px;
   margin: auto;
@@ -36,7 +35,6 @@ input {
   background: #334155;
 }
 
-/* Karte */
 .card {
   background: #1e293b;
   margin: 20px auto;
@@ -45,7 +43,6 @@ input {
   max-width: 500px;
 }
 
-/* Combos */
 .combo {
   background: #1e293b;
   margin: 10px auto;
@@ -63,141 +60,134 @@ input {
 <h1>🧙 MTG Combo Finder</h1>
 
 <input id="search" placeholder="Kartennamen eingeben...">
-
 <div id="suggestions"></div>
+
 <div id="results"></div>
 <div id="combos"></div>
 
 <script>
 
-// ✅ COMBO DATENBANK
-const combos = [
-  {
-    name: "Heliod + Walking Ballista",
-    cards: ["Heliod, Sun-Crowned", "Walking Ballista"],
-    effect: "Unendlicher Schaden",
-    how: "Gib Ballista Lifeline → Schaden → Leben → Marke zurück → repeat"
-  },
-  {
-    name: "Thassa's Oracle Combo",
-    cards: ["Thassa's Oracle", "Demonic Consultation"],
-    effect: "Sofortiger Sieg",
-    how: "Deck exilen → Oracle spielen → gewinnen"
-  },
-  {
-    name: "Devoted Druid Combo",
-    cards: ["Devoted Druid", "Vizier of Remedies"],
-    effect: "Unendliches Mana",
-    how: "Tap → enttap → repeat"
-  }
-];
+document.addEventListener("DOMContentLoaded", function () {
 
+  const input = document.getElementById("search");
+  const suggestions = document.getElementById("suggestions");
 
-// 🔎 AUTOCOMPLETE
-document.getElementById("search").addEventListener("input", function() {
+  // ✅ COMBO DATENBANK
+  const combos = [
+    {
+      name: "Heliod + Walking Ballista",
+      cards: ["Heliod, Sun-Crowned", "Walking Ballista"],
+      effect: "Unendlicher Schaden",
+      how: "Gib Ballista Lifeline → Schaden → Leben → repeat"
+    },
+    {
+      name: "Thassa's Oracle Combo",
+      cards: ["Thassa's Oracle", "Demonic Consultation"],
+      effect: "Sofortiger Sieg",
+      how: "Deck exilen → Oracle spielen → gewinnen"
+    }
+  ];
 
-  let query = this.value;
+  // 🔎 AUTOCOMPLETE
+  input.addEventListener("input", function () {
 
-  if (query.length < 2) {
-    document.getElementById("suggestions").innerHTML = "";
-    return;
-  }
+    let query = input.value;
 
-  fetch("https://api.scryfall.com/cards/autocomplete?q=" + encodeURIComponent(query))
-    .then(res => res.json())
-    .then(data => {
+    if (query.length < 2) {
+      suggestions.innerHTML = "";
+      return;
+    }
 
-      let box = document.getElementById("suggestions");
-      box.innerHTML = "";
+    fetch("https://api.scryfall.com/cards/autocomplete?q=" + encodeURIComponent(query))
+      .then(res => res.json())
+      .then(data => {
 
-      if (!data.data) return;
+        suggestions.innerHTML = "";
 
-      data.data.forEach(name => {
+        if (!data.data) return;
 
-        let div = document.createElement("div");
-        div.className = "suggestion";
-        div.innerText = name;
+        data.data.forEach(name => {
 
-        // ✅ FIX: setzt Input + lädt Karte
-        div.onclick = function() {
-          document.getElementById("search").value = name;
-          loadCard(name);
-        };
+          let div = document.createElement("div");
+          div.className = "suggestion";
+          div.innerText = name;
 
-        box.appendChild(div);
+          div.onclick = function () {
+            input.value = name;
+            loadCard(name);
+          };
+
+          suggestions.appendChild(div);
+        });
+
+      })
+      .catch(() => {
+        suggestions.innerHTML = "<p>Fehler</p>";
       });
 
-    })
-    .catch(err => console.log("Fehler:", err));
-});
+  });
 
+  // 🎴 KARTE LADEN
+  function loadCard(name) {
 
-// 🎴 KARTE LADEN
-function loadCard(name) {
+    document.getElementById("results").innerHTML = "<p>Lade Karte...</p>";
+    document.getElementById("combos").innerHTML = "";
+    suggestions.innerHTML = "";
 
-  const results = document.getElementById("results");
-  const comboBox = document.getElementById("combos");
+    fetch("https://api.scryfall.com/cards/named?fuzzy=" + encodeURIComponent(name))
+      .then(res => res.json())
+      .then(card => {
 
-  // Dropdown schließen
-  document.getElementById("suggestions").innerHTML = "";
+        let image = card.image_uris?.normal ||
+                    card.card_faces?.[0]?.image_uris?.normal || "";
 
-  results.innerHTML = "<p>Lade Karte...</p>";
-  comboBox.innerHTML = "";
+        let text = card.oracle_text ||
+                   card.card_faces?.[0]?.oracle_text ||
+                   "Kein Text";
 
-  fetch("https://api.scryfall.com/cards/named?fuzzy=" + encodeURIComponent(name))
-    .then(res => res.json())
-    .then(card => {
+        let type = card.type_line || "";
 
-      let image = card.image_uris?.normal ||
-                  card.card_faces?.[0]?.image_uris?.normal || "";
+        document.getElementById("results").innerHTML = `
+          <div class="card">
+            ${image ? `<img src="${image}" width           <h2>${card.name}</h2>
+            <p>${type}</p>
+            <p style="white-space: pre-line;">${text}</p>
+          </div>
+        `;
 
-      let text = card.oracle_text ||
-                 card.card_faces?.[0]?.oracle_text ||
-                 "Kein Text verfügbar";
-
-      let type = card.type_line || "";
-
-      results.innerHTML = `
-        <div class="card">
-          ${image ? `<img src="${image}" width="250    <h2>${card.name}</h2>
-          <p>${type}</p>
-          <p style="white-space: pre-line;">${text}</p>
-        </div>
-      `;
-
-      // ✅ Combos anzeigen
-      showCombos(card.name);
-    });
-}
-
-
-// 🔥 COMBO SYSTEM
-function showCombos(cardName) {
-
-  const comboBox = document.getElementById("combos");
-
-  let matches = combos.filter(c =>
-    c.cards.includes(cardName)
-  );
-
-  if (matches.length === 0) {
-    comboBox.innerHTML = "<p>Keine Combos gefunden 😢</p>";
-    return;
+        showCombos(card.name);
+      });
   }
 
-  comboBox.innerHTML = "<h2>Passende Combos:</h2>";
+  // 🔥 COMBOS
+  function showCombos(cardName) {
 
-  matches.forEach(c => {
-    comboBox.innerHTML += `
-      <div class="combo">
-        <h3>${c.name}</h3>
-        <p><b>Karten:</b> ${c.cards.join(", ")}</p>
-        <p><b>Effekt:</b> ${c.effect}</p>
-        <p><b>So funktioniert es:</b> ${c.how}</p>
-      </div>
-    `;
-  });
-}
+    const comboBox = document.getElementById("combos");
+
+    let results = combos.filter(c =>
+      c.cards.includes(cardName)
+    );
+
+    if (results.length === 0) {
+      comboBox.innerHTML = "<p>Keine Combos gefunden</p>";
+      return;
+    }
+
+    comboBox.innerHTML = "<h2>Combos:</h2>";
+
+    results.forEach(c => {
+      comboBox.innerHTML += `
+        <div class="combo">
+          <h3>${c.name}</h3>
+          <p>${c.cards.join(", ")}</p>
+          <p>${c.effect}</p>
+          <p>${c.how}</p>
+        </div>
+      `;
+    });
+  }
+
+});
 
 </script>
 
