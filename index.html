@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -8,26 +9,22 @@
 body {
   margin: 0;
   font-family: "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top, #020617, #0f172a);
+  background: #020617;
   color: white;
   text-align: center;
 }
 
-/* Titel */
 h1 {
   margin-top: 40px;
-  font-size: 40px;
   color: #f97316;
 }
 
-/* Container */
 .container {
   display: flex;
   justify-content: center;
   margin-top: 60px;
 }
 
-/* FLIP CARD */
 .card {
   width: 300px;
   height: 420px;
@@ -47,7 +44,6 @@ h1 {
   transform: rotateY(180deg);
 }
 
-/* FRONT / BACK */
 .front, .back {
   position: absolute;
   width: 100%;
@@ -57,152 +53,161 @@ h1 {
   backface-visibility: hidden;
 }
 
-/* FRONT */
 .front img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* BACK */
 .back {
   background: linear-gradient(135deg, #7c2d12, #1e293b);
   transform: rotateY(180deg);
-
   display: flex;
-  align-items: center;
-  justify-content: center;
   flex-direction: column;
-}
-
-.back h2 {
-  color: #f97316;
-}
-
-/* Glow */
-.card:hover {
-  box-shadow: 0 0 25px rgba(249,115,22,0.7);
-}
-
-/* COMBO PAGE */
-#comboPage {
-  display: none;
-  padding: 20px;
+  justify-content: center;
 }
 
 .combo {
   background: #1e293b;
-  margin: 15px auto;
+  margin: 10px auto;
   padding: 15px;
   border-radius: 10px;
   max-width: 600px;
-  border: 1px solid #334155;
+  cursor: pointer;
+}
+
+.cardView {
+  background: #1e293b;
+  padding: 20px;
+  margin: 20px;
+  border-radius: 10px;
+}
+
+.cardImages {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.cardImages img {
+  width: 150px;
+  border-radius: 10px;
 }
 
 button {
   padding: 10px;
-  border-radius: 8px;
-  border: none;
   background: #f97316;
+  border: none;
+  border-radius: 8px;
   color: white;
   cursor: pointer;
 }
 </style>
-
 </head>
 
 <body>
 
 <h1>🔥 Shiinos Combis 🔥</h1>
 
-<!-- ✅ STARTSEITE -->
 <div id="homePage" class="container">
-
   <div class="card" onclick="openDeck()">
     <div class="inner">
-
-      <!-- ✅ FRONT -->
       <div class="front">
-        <img src="azula.jpg">
+        azula.jpg
       </div>
-
-      <!-- ✅ BACK -->
       <div class="back">
         <h2>Azula Deck</h2>
         <p>Combos:</p>
         <h2 id="comboCount"></h2>
       </div>
-
     </div>
   </div>
-
 </div>
 
-
-<!-- ✅ COMBO SEITE -->
-<div id="comboPage">
-
-  <h1>🔥 Azula Combos 🔥</h1>
-
+<div id="comboPage" style="display:none;">
+  <h1>Azula Combos</h1>
   <div id="comboList"></div>
-
   <br>
   <button onclick="goBack()">⬅ Zurück</button>
-
 </div>
 
+<div id="detailPage" style="display:none;">
+  <h1 id="comboTitle"></h1>
+  <div id="comboDetail"></div>
+  <br>
+  <button onclick="backToCombos()">⬅ Zurück</button>
+</div>
 
 <script>
 
-// ✅ DEINE COMBOS
 const combos = [
   {
-    name: "Heliod + Walking Ballista",
-    text: "Unendlich Schaden"
+    name: "Heliod + Ballista",
+    cards: ["Heliod, Sun-Crowned", "Walking Ballista"],
+    text: "Unendlich Schaden durch Lifegain Loop"
   },
   {
-    name: "Thassa's Oracle + Consultation",
-    text: "Sofortiger Sieg"
-  },
-  {
-    name: "Devoted Druid + Vizier",
-    text: "Unendlich Mana"
+    name: "Hellkite Comet",
+    cards: ["Hellkite Charger", "Sozin's Comet"],
+    text: "Mehrere Combat Phasen und starker Druck"
   }
 ];
 
-
-// ✅ ANZAHL AUF RÜCKSEITE SETZEN
 document.getElementById("comboCount").innerText = combos.length;
 
-
-// 👉 CLICK → DECK ÖFFNEN
 function openDeck() {
-
   document.getElementById("homePage").style.display = "none";
   document.getElementById("comboPage").style.display = "block";
 
   const list = document.getElementById("comboList");
   list.innerHTML = "";
 
-  combos.forEach(c => {
+  combos.forEach((c, index) => {
     list.innerHTML += `
-      <div class="combo">
+      <div class="combo" onclick="openCombo(${index})">
         <h3>${c.name}</h3>
-        <p>${c.text}</p>
       </div>
     `;
   });
 }
 
+function openCombo(index) {
+  const combo = combos[index];
 
-// 👉 ZURÜCK
+  document.getElementById("comboPage").style.display = "none";
+  document.getElementById("detailPage").style.display = "block";
+
+  document.getElementById("comboTitle").innerText = combo.name;
+
+  let cardsHTML = "";
+  combo.cards.forEach(card => {
+    const imageURL = `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card)}&format=image`;
+    cardsHTML += `<img src="${imageURL}" alt="${card}">`;
+  });
+
+  document.getElementById("comboDetail").innerHTML = `
+    <div class="cardView">
+      <h3>Karten:</h3>
+      <div class="cardImages">${cardsHTML}</div>
+      <br>
+      <h3>Beschreibung:</h3>
+      <p>${combo.text}</p>
+    </div>
+  `;
+}
+
 function goBack() {
   document.getElementById("homePage").style.display = "flex";
   document.getElementById("comboPage").style.display = "none";
+}
+
+function backToCombos() {
+  document.getElementById("detailPage").style.display = "none";
+  document.getElementById("comboPage").style.display = "block";
 }
 
 </script>
 
 </body>
 </html>
-``
