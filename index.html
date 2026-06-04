@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>MTG Combo Finder</title>
+<title>MTG Card Finder</title>
 
 <style>
 body {
@@ -12,10 +12,6 @@ body {
   text-align: center;
 }
 
-h1 {
-  margin-top: 20px;
-}
-
 input {
   padding: 10px;
   width: 260px;
@@ -23,7 +19,6 @@ input {
   border: none;
 }
 
-/* Vorschläge */
 #suggestions {
   width: 260px;
   margin: auto;
@@ -40,7 +35,6 @@ input {
   background: #334155;
 }
 
-/* Karte */
 .card {
   background: #1e293b;
   margin: 20px auto;
@@ -48,158 +42,101 @@ input {
   border-radius: 12px;
   max-width: 500px;
 }
-
-/* Combos */
-.combo {
-  background: #1e293b;
-  margin: 10px auto;
-  padding: 12px;
-  border-radius: 10px;
-  max-width: 500px;
-  border: 1px solid #334155;
-}
 </style>
+
 </head>
 
 <body>
 
-<h1>🧙 MTG Combo Finder</h1>
+<h1>🧙 MTG Card Finder</h1>
 
-<input id="search" placeholder="Karte eingeben...">
+<input id="search" placeholder="Karte suchen...">
 <div id="suggestions"></div>
-
-<div id="results"></div>
-<div id="combos"></div>
+<div id="result"></div>
 
 <script>
 
-document.addEventListener("DOMContentLoaded", function () {
+// Input Event
+document.getElementById("search").addEventListener("input", function() {
 
-  const input = document.getElementById("search");
-  const suggestions = document.getElementById("suggestions");
-  const results = document.getElementById("results");
-  const combosBox = document.getElementById("combos");
+  const query = this.value;
 
-  // ✅ Combos
-  const combos = [
-    {
-      name: "Heliod + Walking Ballista",
-      cards: ["Heliod, Sun-Crowned", "Walking Ballista"],
-      effect: "Unendlich Schaden",
-      how: "Lifelink + Schaden → Lebensgewinn → Marken → repeat"
-    },
-    {
-      name: "Thassa's Oracle Combo",
-      cards: ["Thassa's Oracle", "Demonic Consultation"],
-      effect: "Sofortiger Sieg",
-      how: "Deck exilen → Oracle spielen → gewinnen"
-    }
-  ];
-
-  // 🔎 AUTOCOMPLETE
-  input.addEventListener("input", function () {
-
-    const query = input.value;
-
-    if (query.length < 2) {
-      suggestions.innerHTML = "";
-      return;
-    }
-
-    suggestions.innerHTML = "<p>Lade...</p>";
-
-    fetch("https://api.scryfall.com/cards/autocomplete?q=" + encodeURIComponent(query))
-      .then(res => res.json())
-      .then(data => {
-
-        suggestions.innerHTML = "";
-
-        if (!data || !data.data) {
-          suggestions.innerHTML = "<p>Keine Ergebnisse</p>";
-          return;
-        }
-
-        data.data.forEach(name => {
-
-          const div = document.createElement("div");
-          div.className = "suggestion";
-          div.textContent = name;
-
-          div.onclick = function () {
-            input.value = name;
-            loadCard(name);
-          };
-
-          suggestions.appendChild(div);
-        });
-      })
-      .catch(err => {
-        console.log(err);
-        suggestions.innerHTML = "<p style='color:red'>API Fehler</p>";
-      });
-  });
-
-  // 🎴 KARTE LADEN
-  function loadCard(name) {
-
-    results.innerHTML = "<p>Lade Karte...</p>";
-    combosBox.innerHTML = "";
-    suggestions.innerHTML = "";
-
-    fetch("https://api.scryfall.com/cards/named?fuzzy=" + encodeURIComponent(name))
-      .then(res => res.json())
-      .then(card => {
-
-        let image = card.image_uris?.normal ||
-                    card.card_faces?.[0]?.image_uris?.normal ||
-                    "";
-
-        let text = card.oracle_text ||
-                   card.card_faces?.[0]?.oracle_text ||
-                   "Kein Text verfügbar";
-
-        results.innerHTML = `
-          <div class="card">
-            ${image ? `<img src="${image}" width           <h2>${card.name}</h2>
-            <p>${card.type_line || ""}</p>
-            <p style="white-space: pre-line;">${text}</p>
-          </div>
-        `;
-
-        showCombos(card.name);
-      })
-      .catch(() => {
-        results.innerHTML = "<p>Fehler beim Laden</p>";
-      });
+  if (query.length < 2) {
+    document.getElementById("suggestions").innerHTML = "";
+    return;
   }
 
-  // 🔥 COMBOS ANZEIGEN
-  function showCombos(cardName) {
+  document.getElementById("suggestions").innerHTML = "Lade...";
 
-    const matches = combos.filter(c =>
-      c.cards.includes(cardName)
-    );
+  fetch("https://api.scryfall.com/cards/autocomplete?q=" + encodeURIComponent(query))
+    .then(response => response.json())
+    .then(data => {
 
-    if (matches.length === 0) {
-      combosBox.innerHTML = "<p>Keine Combos gefunden 😢</p>";
-      return;
-    }
+      const box = document.getElementById("suggestions");
+      box.innerHTML = "";
 
-    combosBox.innerHTML = "<h2>Combos:</h2>";
+      if (!data.data) {
+        box.innerHTML = "Keine Ergebnisse";
+        return;
+      }
 
-    matches.forEach(c => {
-      combosBox.innerHTML += `
-        <div class="combo">
-          <h3>${c.name}</h3>
-          <p>${c.cards.join(", ")}</p>
-          <p>${c.effect}</p>
-          <p>${c.how}</p>
-        </div>
-      `;
+      data.data.forEach(name => {
+
+        const div = document.createElement("div");
+        div.className = "suggestion";
+        div.innerText = name;
+
+        // CLICK FIX
+        div.onclick = function() {
+          document.getElementById("search").value = name;
+          loadCard(name);
+        };
+
+        box.appendChild(div);
+      });
+
+    })
+    .catch(() => {
+      document.getElementById("suggestions").innerHTML = "Fehler";
     });
-  }
 
 });
+
+
+// Karte laden
+function loadCard(name) {
+
+  document.getElementById("result").innerHTML = "Lade Karte...";
+
+  fetch("https://api.scryfall.com/cards/named?fuzzy=" + encodeURIComponent(name))
+    .then(res => res.json())
+    .then(card => {
+
+      let image = "";
+      if (card.image_uris && card.image_uris.normal) {
+        image = card.image_uris.normal;
+      } else if (card.card_faces && card.card_faces[0].image_uris) {
+        image = card.card_faces[0].image_uris.normal;
+      }
+
+      let text = card.oracle_text || 
+                 (card.card_faces && card.card_faces[0].oracle_text) || 
+                 "Kein Text";
+
+      document.getElementById("result").innerHTML =
+        '<div class="card">' +
+        (image ? '<img src="' + image + '" width="250"><br><br>' : '') +
+        '<h2>' + card.name + '</h2>' +
+        '<p>' + (card.type_line || '') + '</p>' +
+        '<p style="white-space: pre-line;">' + text + '</p>' +
+        '</div>';
+
+    })
+    .catch(() => {
+      document.getElementById("result").innerHTML = "Fehler beim Laden";
+    });
+
+}
 
 </script>
 
