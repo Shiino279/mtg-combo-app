@@ -2,27 +2,29 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>MTG Finder</title>
+<title>MTG Finder Pro</title>
 
 <style>
 body {
+  margin: 0;
+  font-family: Arial;
   background: #0f172a;
   color: white;
-  font-family: Arial;
-  margin: 0;
   text-align: center;
 }
 
 input {
   padding: 10px;
-  margin-top: 20px;
   width: 250px;
+  margin-top: 20px;
 }
 
 #suggestions {
   background: #1e293b;
   width: 250px;
   margin: auto;
+  max-height: 200px;
+  overflow-y: auto;
 }
 
 .suggestion {
@@ -34,10 +36,23 @@ input {
   background: #334155;
 }
 
+#recent {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+#recent img {
+  height: 80px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
 .card {
-  margin: 20px;
   background: #1e293b;
   padding: 15px;
+  margin: 20px;
 }
 </style>
 </head>
@@ -47,15 +62,49 @@ input {
 <h1>🧙 MTG Finder</h1>
 
 <input id="search" placeholder="Karte suchen..." oninput="autoComplete()">
+
 <div id="suggestions"></div>
+
+<!-- 🔁 letzte Karten -->
+<div id="recent"></div>
 
 <div id="result"></div>
 
 <script>
-function autoComplete() {
+
+// 💾 RECENT LADEN
+let recentCards = JSON.parse(localStorage.getItem("recentCards")) || [];
+
+// 🔁 RECENT HINZUFÜGEN
+function addRecent(cardName) {
+  recentCards = recentCards.filter(c => c !== cardName);
+  recentCards.unshift(cardName);
+
+  if (recentCards.length > 5) {
+    recentCards.pop();
+  }
+
+  localStorage.setItem("recentCards", JSON.stringify(recentCards));
+  renderRecent();
+}
+
+// 📺 RECENT ANZEIGEN
+function renderRecent() {
+  let container = document.getElementById("recent");
+  container.innerHTML = "";
+
+  recentCards.forEach(card => {
+    container.innerHTML += `
+      <img 
+        src="https://api.scryfall.com/cards/named?exact=${card}&format=image"
+        onclick="searchCard('${card}')"
+
   let q = document.getElementById("search").value;
 
-  if (q.length < 2) return;
+  if (q.length < 2) {
+    document.getElementById("suggestions").innerHTML = "";
+    return;
+  }
 
   fetch("https://api.scryfall.com/cards/autocomplete?q=" + q)
     .then(res => res.json())
@@ -63,27 +112,56 @@ function autoComplete() {
       let box = document.getElementById("suggestions");
       box.innerHTML = "";
 
+      if (!data.data) return;
+
       data.data.forEach(name => {
-        box.innerHTML += `<div class="suggestion" onclick="loadCard('${name}')">${name}</div>`;
+        box.innerHTML += `
+          <div class="suggestion" onclick="searchCard('${name}')">
+            ${name}
+          </div>
+        `;
       });
-    });
+    })
+    .catch(() => console.log("Autocomplete Fehler"));
 }
 
-function loadCard(name) {
+// 🎴 KARTE LADEN (MIT FIX!)
+function searchCard(name) {
   document.getElementById("suggestions").innerHTML = "";
 
   fetch("https://api.scryfall.com/cards/named?fuzzy=" + name)
     .then(res => res.json())
     .then(card => {
+
+      // ✅ Bild Fix (für alle Karten)
+      let image = "";
+      if (card.image_uris) {
+        image = `<img src="${card.image_uris.normal}" widthf (card.card_faces) {
+        image = `<img src="${card.card_faces[0].image_uris.normal}" width="/ ✅ Text Fix
+      let text = card.oracle_text || "";
+      if (!text && card.card_faces) {
+        text = card.card_faces[0].oracle_text || "";
+      }
+
       document.getElementById("result").innerHTML = `
         <div class="card">
           <h2>${card.name}</h2>
-          <img src="${card.image_uris.normal}" width="200rd.type_line}</p>
-          <p>${card.oracle_text || ""}</p>
+          ${image}<br>
+          <p>${card.type_line}</p>
+          <p>${text}</p>
         </div>
       `;
+
+      addRecent(card.name);
+    })
+    .catch(() => {
+      document.getElementById("result").innerHTML = "Fehler beim Laden 😢";
     });
 }
+
+// INIT
+renderRecent();
+
 </script>
 
 </body>
