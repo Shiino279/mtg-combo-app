@@ -8,7 +8,7 @@
 body {
   margin: 0;
   font-family: "Segoe UI", sans-serif;
-  background: #020617;
+  background: radial-gradient(circle at top, #020617, #0f172a);
   color: white;
   text-align: center;
 }
@@ -16,33 +16,75 @@ body {
 /* Titel */
 h1 {
   margin-top: 40px;
+  font-size: 40px;
   color: #f97316;
 }
 
 /* Container */
 .container {
-  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+  margin-top: 60px;
 }
 
-/* Karte */
+/* FLIP CARD */
 .card {
   width: 300px;
-  margin: auto;
+  height: 420px;
+  perspective: 1000px;
   cursor: pointer;
 }
 
-.card img {
+.inner {
   width: 100%;
+  height: 100%;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+.card:hover .inner {
+  transform: rotateY(180deg);
+}
+
+/* FRONT / BACK */
+.front, .back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
   border-radius: 15px;
-  transition: 0.3s;
+  overflow: hidden;
+  backface-visibility: hidden;
 }
 
-.card:hover img {
-  transform: scale(1.05);
-  box-shadow: 0 0 25px orange;
+/* FRONT */
+.front img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-/* Combos Bereich */
+/* BACK */
+.back {
+  background: linear-gradient(135deg, #7c2d12, #1e293b);
+  transform: rotateY(180deg);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.back h2 {
+  color: #f97316;
+}
+
+/* Glow */
+.card:hover {
+  box-shadow: 0 0 25px rgba(249,115,22,0.7);
+}
+
+/* COMBO PAGE */
 #comboPage {
   display: none;
   padding: 20px;
@@ -56,6 +98,15 @@ h1 {
   max-width: 600px;
   border: 1px solid #334155;
 }
+
+button {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: #f97316;
+  color: white;
+  cursor: pointer;
+}
 </style>
 
 </head>
@@ -64,17 +115,26 @@ h1 {
 
 <h1>🔥 Shiinos Combis 🔥</h1>
 
-<!-- STARTSEITE -->
+<!-- ✅ STARTSEITE -->
 <div id="homePage" class="container">
 
   <div class="card" onclick="openDeck()">
-    
-    <!-- ✅ DEIN LOKALES BILD -->
-    <img src="azula.jpg">
+    <div class="inner">
 
+      <!-- ✅ FRONT -->
+      <div class="front">
+        <img src="azula.jpg">
+      </div>
+
+      <!-- ✅ BACK -->
+      <div class="back">
+        <h2>Azula Deck</h2>
+        <p>Combos:</p>
+        <h2 id="comboCount"></h2>
+      </div>
+
+    </div>
   </div>
-
-  <p>Klick auf dein Deck</p>
 
 </div>
 
@@ -82,7 +142,7 @@ h1 {
 <!-- ✅ COMBO SEITE -->
 <div id="comboPage">
 
-  <h1>🔥 Azula Deck Combos 🔥</h1>
+  <h1>🔥 Azula Combos 🔥</h1>
 
   <div id="comboList"></div>
 
@@ -98,7 +158,7 @@ h1 {
 const combos = [
   {
     name: "Heliod + Walking Ballista",
-    text: "Unendlich Schaden durch Lifegain Loop"
+    text: "Unendlich Schaden"
   },
   {
     name: "Thassa's Oracle + Consultation",
@@ -111,7 +171,11 @@ const combos = [
 ];
 
 
-// 👉 Klick auf Karte
+// ✅ ANZAHL AUF RÜCKSEITE SETZEN
+document.getElementById("comboCount").innerText = combos.length;
+
+
+// 👉 CLICK → DECK ÖFFNEN
 function openDeck() {
 
   document.getElementById("homePage").style.display = "none";
@@ -131,9 +195,9 @@ function openDeck() {
 }
 
 
-// 👉 Zurück
+// 👉 ZURÜCK
 function goBack() {
-  document.getElementById("homePage").style.display = "block";
+  document.getElementById("homePage").style.display = "flex";
   document.getElementById("comboPage").style.display = "none";
 }
 
@@ -141,3 +205,4 @@ function goBack() {
 
 </body>
 </html>
+``
